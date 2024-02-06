@@ -7,8 +7,8 @@
 AHKCharacterBase::AHKCharacterBase()
 {
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Main/Meshs/TwinBlast_ShadowOps.TwinBlast_ShadowOps'"));
-	if (CharacterMeshRef.Object)
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Main/Mesh/TwinBlast_ShadowOps.TwinBlast_ShadowOps'"));
+	if (CharacterMeshRef.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}

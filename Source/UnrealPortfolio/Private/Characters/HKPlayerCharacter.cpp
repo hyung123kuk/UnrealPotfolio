@@ -8,6 +8,8 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Animation/HKAnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 
 AHKPlayerCharacter::AHKPlayerCharacter()
 {
@@ -34,21 +36,27 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 
 
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Main/Input/IMC_Gun.IMC_Gun'"));
-	if (InputMappingContextRef.Object)
+	if (InputMappingContextRef.Succeeded())
 	{
 		DefaultMappingContext = InputMappingContextRef.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UInputAction> MoveActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_Move.IA_Move'"));
-	if (InputMappingContextRef.Object)
+	if (InputMappingContextRef.Succeeded())
 	{
 		MoveAction = MoveActionRef.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UInputAction> LookActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_Look.IA_Look'"));
-	if (InputMappingContextRef.Object)
+	if (InputMappingContextRef.Succeeded())
 	{
 		LookAction = LookActionRef.Object;
+	}
+
+	ConstructorHelpers::FClassFinder<UHKAnimInstance> AnimInstanceRef(TEXT("/Script/Engine.Blueprint'/Game/Main/Blueprints/Animation/BP_AnimInstance.BP_AnimInstance_C'"));
+	if (AnimInstanceRef.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(AnimInstanceRef.Class);
 	}
 
 }
@@ -77,9 +85,7 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 void AHKPlayerCharacter::Move(const FInputActionValue& Value)
 {
-	FVector2D MovementVector = Value.Get<FVector2D>();
-	float ForwardInputValue = MovementVector.X;
-	float RightInputValue = MovementVector.Y;
+	InputMoveValue = Value.Get<FVector2D>();
 
 	const FRotator CurrentControlRotation = GetController()->GetControlRotation();
 	const FRotator CurrentControlRotationYaw(0.f, CurrentControlRotation.Yaw, 0.f);
@@ -87,8 +93,8 @@ void AHKPlayerCharacter::Move(const FInputActionValue& Value)
 	FVector ForwardDirection = FRotationMatrix(CurrentControlRotationYaw).GetUnitAxis(EAxis::X);
 	FVector RightDirection = FRotationMatrix(CurrentControlRotationYaw).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(ForwardDirection, MovementVector.X);
-	AddMovementInput(RightDirection, MovementVector.Y);
+	AddMovementInput(ForwardDirection, InputMoveValue.X);
+	AddMovementInput(RightDirection, InputMoveValue.Y);
 }
 
 void AHKPlayerCharacter::Look(const FInputActionValue& InValue)
