@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Animation/HKAnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "UnrealPortfolio/UnrealPortfolio.h"
 
 AHKPlayerCharacter::AHKPlayerCharacter()
 {
@@ -65,10 +66,15 @@ void AHKPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+
+	if (IsValid(PlayerController) == true)
 	{
-		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+		if (IsValid(Subsystem) == true)
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
 	}
 }
 
