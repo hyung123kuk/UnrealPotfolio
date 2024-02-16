@@ -28,21 +28,14 @@ void UHKAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (Movement)
 	{
 		Velocity = Movement->Velocity;
-		ControlRotation = Owner->GetControlRotation();
 
-		const FVector CharacterMovementVector = Owner->GetLastMovementInputVector();
-		bool isMove = (CharacterMovementVector != FVector().Zero());
-		if (isMove)
+		const AHKPlayerCharacter* PlayerCharacter = Cast<AHKPlayerCharacter>(Owner);
+		if (PlayerCharacter != nullptr)
 		{
-			const AHKPlayerCharacter* PlayerCharacter = Cast<AHKPlayerCharacter>(Owner);
-			if (PlayerCharacter != nullptr)
-			{
-				InputMoveValue = PlayerCharacter->GetInputValue();
-			}
-		}
-		else
-		{
-			InputMoveValue = FVector2D().Zero();
+			bool isMove = Velocity != FVector().Zero();
+			InputMoveValue = isMove? PlayerCharacter->GetMoveValue():FVector2D().Zero();
+
+			ControlRotation = PlayerCharacter->GetLookValue();
 		}
 	}
 }

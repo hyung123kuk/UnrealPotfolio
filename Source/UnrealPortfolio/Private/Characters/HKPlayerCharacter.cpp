@@ -11,9 +11,13 @@
 #include "Animation/HKAnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "UnrealPortfolio/UnrealPortfolio.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/Engine.h"
 
 AHKPlayerCharacter::AHKPlayerCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->TargetArmLength = 400.0f;
@@ -89,6 +93,15 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 }
 
+void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, InputMoveValue);
+	DOREPLIFETIME(ThisClass, InputLookValue);
+
+}
+
 void AHKPlayerCharacter::Move(const FInputActionValue& Value)
 {
 	InputMoveValue = Value.Get<FVector2D>();
@@ -101,6 +114,8 @@ void AHKPlayerCharacter::Move(const FInputActionValue& Value)
 
 	AddMovementInput(ForwardDirection, InputMoveValue.X);
 	AddMovementInput(RightDirection, InputMoveValue.Y);
+
+	UpdateInputMoveValue_Server(InputMoveValue);
 }
 
 void AHKPlayerCharacter::Look(const FInputActionValue& InValue)
@@ -109,5 +124,19 @@ void AHKPlayerCharacter::Look(const FInputActionValue& InValue)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+
+	InputLookValue = GetControlRotation();
+	UpdateInputLookValue_Server(InputLookValue);
 }
-	
+
+void AHKPlayerCharacter::UpdateInputMoveValue_Server_Implementation(const FVector2D& OwnerInputMoveValue)
+{
+	InputMoveValue.X = OwnerInputMoveValue.X;
+	InputMoveValue.Y = OwnerInputMoveValue.Y;
+}
+
+void AHKPlayerCharacter::UpdateInputLookValue_Server_Implementation(const FRotator& OwnerInputLookValue)
+{
+	InputLookValue = OwnerInputLookValue;
+}
+
