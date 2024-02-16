@@ -13,9 +13,13 @@
 #include "UnrealPortfolio/UnrealPortfolio.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
+#include "AbilitySystemComponent.h"
+#include "Game/HKPlayerState.h"
 
 AHKPlayerCharacter::AHKPlayerCharacter()
 {
+	bReplicates = true;
+
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
@@ -58,6 +62,12 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 		LookAction = LookActionRef.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UInputAction> JumpActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_Jump.IA_Jump'"));
+	if (InputMappingContextRef.Succeeded())
+	{
+		JumpAction = JumpActionRef.Object;
+	}
+
 	ConstructorHelpers::FClassFinder<UHKAnimInstance> AnimInstanceRef(TEXT("/Script/Engine.Blueprint'/Game/Main/Blueprints/Animation/BP_AnimInstance.BP_AnimInstance_C'"));
 	if (AnimInstanceRef.Succeeded())
 	{
@@ -91,6 +101,12 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 
+	if (IsValid(ASC))
+	{
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 0);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AHKPlayerCharacter::GASInputReleased, 0);
+	}
+
 }
 
 void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -100,6 +116,77 @@ void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME(ThisClass, InputMoveValue);
 	DOREPLIFETIME(ThisClass, InputLookValue);
 
+}
+
+void AHKPlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	AHKPlayerState* GASPS = GetPlayerState<AHKPlayerState>();
+	if (GASPS)
+	{
+		ASC = GASPS->GetAbilitySystemComponent();
+		ASC->InitAbilityActorInfo(GASPS, this);
+	}
+
+	for (const auto& StartInputAbility : StartInputAbilities)
+	{
+		FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
+		StartSpec.InputID = StartInputAbility.Key;
+		ASC->GiveAbility(StartSpec);
+	}
+}
+
+void AHKPlayerCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState(); 
+	AHKPlayerState* GASPS = GetPlayerState<AHKPlayerState>();
+	if (GASPS)
+	{
+		ASC = GASPS->GetAbilitySystemComponent();
+		ASC->InitAbilityActorInfo(GASPS, this);
+
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		if (PlayerController)
+		{
+			PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
+		}
+	}
+}
+
+UAbilitySystemComponent* AHKPlayerCharacter::GetAbilitySystemComponent() const
+{
+	return ASC;
+}
+
+void AHKPlayerCharacter::GASInputPressed(int32 InputId)
+{
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
+	if (Spec)
+	{
+		Spec->InputPressed = true;
+		if (Spec->IsActive())
+		{
+			ASC->AbilitySpecInputPressed(*Spec);
+		}
+		else
+		{
+			ASC->TryActivateAbility(Spec->Handle);
+		}
+	}
+}
+
+void AHKPlayerCharacter::GASInputReleased(int32 InputId)
+{
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
+	if (Spec)
+	{
+		Spec->InputPressed = false;
+		if (Spec->IsActive())
+		{
+			ASC->AbilitySpecInputReleased(*Spec);
+		}
+
+	}
 }
 
 void AHKPlayerCharacter::Move(const FInputActionValue& Value)

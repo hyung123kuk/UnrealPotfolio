@@ -17,4 +17,4 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogABNetwork, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogABTeleport, Log, All);
 
-//AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("Begin"));
+//NET_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("Begin"));
