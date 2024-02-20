@@ -21,7 +21,6 @@ void UHKAbilityTask_Jump::Activate()
 	ACharacter* Character = CastChecked<ACharacter>(GetAvatarActor());
 	Character->LandedDelegate.AddDynamic(this, &UHKAbilityTask_Jump::OnLandedCallback);
 	Character->Jump();
-
 	SetWaitingOnAvatar();
 }
 

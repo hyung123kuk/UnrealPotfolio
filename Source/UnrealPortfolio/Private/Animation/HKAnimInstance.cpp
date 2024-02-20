@@ -28,7 +28,8 @@ void UHKAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (Movement)
 	{
 		Velocity = Movement->Velocity;
-
+		bIsFalling = Movement->IsFalling();
+		bIsJumping = bIsFalling & (Velocity.Z > 100.f);
 		const AHKPlayerCharacter* PlayerCharacter = Cast<AHKPlayerCharacter>(Owner);
 		if (PlayerCharacter != nullptr)
 		{
