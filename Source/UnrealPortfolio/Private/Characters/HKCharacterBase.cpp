@@ -13,6 +13,12 @@ AHKCharacterBase::AHKCharacterBase()
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
+	ConstructorHelpers::FObjectFinder<UAnimMontage> ShotMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Main/Animation/Montage/AM_Shot.AM_Shot'"));
+	if (ShotMontageRef.Succeeded())
+	{
+		ShotMontage = ShotMontageRef.Object;
+	}
+
 }
 
 

@@ -26,11 +26,14 @@ public:
 	UHKCharacterAttributeSet();
 	ATTRIBUTE_ACCESSORS(UHKCharacterAttributeSet, Health);
 	ATTRIBUTE_ACCESSORS(UHKCharacterAttributeSet, MaxHealth);
+	ATTRIBUTE_ACCESSORS(UHKCharacterAttributeSet, Damage);
 
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Health", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData Health;
-	UPROPERTY(BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, Category = "Health", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxHealth;
+	UPROPERTY(BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Damage;
 };

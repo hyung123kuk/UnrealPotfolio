@@ -68,6 +68,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> JumpAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> AttackAction;
+
 //Ability Params
 protected:
 	UPROPERTY(EditAnywhere, Category = "AGAS")
@@ -76,6 +79,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AGAS")
 	TMap<int32, TSubclassOf<class UGameplayAbility>> StartInputAbilities;
 
+	UPROPERTY(EditAnywhere, Category = "AGAS")
+	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
 
 //Behaviour Params
 private:

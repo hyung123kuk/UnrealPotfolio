@@ -51,21 +51,27 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 	}
 
 	ConstructorHelpers::FObjectFinder<UInputAction> MoveActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_Move.IA_Move'"));
-	if (InputMappingContextRef.Succeeded())
+	if (MoveActionRef.Succeeded())
 	{
 		MoveAction = MoveActionRef.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UInputAction> LookActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_Look.IA_Look'"));
-	if (InputMappingContextRef.Succeeded())
+	if (LookActionRef.Succeeded())
 	{
 		LookAction = LookActionRef.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UInputAction> JumpActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_Jump.IA_Jump'"));
-	if (InputMappingContextRef.Succeeded())
+	if (JumpActionRef.Succeeded())
 	{
 		JumpAction = JumpActionRef.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UInputAction> AttackActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_Shot.IA_Shot'"));
+	if (AttackActionRef.Succeeded())
+	{
+		AttackAction = AttackActionRef.Object;
 	}
 
 	ConstructorHelpers::FClassFinder<UHKAnimInstance> AnimInstanceRef(TEXT("/Script/Engine.Blueprint'/Game/Main/Blueprints/Animation/BP_AnimInstance.BP_AnimInstance_C'"));
@@ -103,8 +109,8 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	if (IsValid(ASC))
 	{
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 0);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AHKPlayerCharacter::GASInputReleased, 0);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 1);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 2);		
 	}
 
 }
@@ -126,6 +132,12 @@ void AHKPlayerCharacter::PossessedBy(AController* NewController)
 	{
 		ASC = GASPS->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(GASPS, this);
+	}
+
+	for (const auto& StartAbility : StartAbilities)
+	{
+		FGameplayAbilitySpec StartSpec(StartAbility);
+		ASC->GiveAbility(StartSpec);
 	}
 
 	for (const auto& StartInputAbility : StartInputAbilities)

@@ -4,7 +4,8 @@
 #include "AbilitySystem/AttributeSet/HKCharacterAttributeSet.h"
 
 UHKCharacterAttributeSet::UHKCharacterAttributeSet()
-	: MaxHealth(100.f)
+	: MaxHealth(100.f),
+	Damage(0.f)
 {
 	InitHealth(GetMaxHealth());
 }

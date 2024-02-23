@@ -15,4 +15,12 @@ public:
 	// Sets default values for this character's properties
 	AHKCharacterBase();
 
+public:
+	FORCEINLINE virtual class UAnimMontage* GetShotMontage() const { return ShotMontage; }
+
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> ShotMontage;
+
 };
