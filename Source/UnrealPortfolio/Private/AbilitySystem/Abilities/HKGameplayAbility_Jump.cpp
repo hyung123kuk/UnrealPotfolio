@@ -27,7 +27,7 @@ void UHKGameplayAbility_Jump::ActivateAbility(const FGameplayAbilitySpecHandle H
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	UHKAbilityTask_Jump* JumpAndWaitingForLandingTask = UHKAbilityTask_Jump::CreateTast(this);
+	UHKAbilityTask_Jump* JumpAndWaitingForLandingTask = UHKAbilityTask_Jump::CreateTask(this);
 	JumpAndWaitingForLandingTask->OnComplete.AddDynamic(this, &UHKGameplayAbility_Jump::OnLandedCallback);
 	JumpAndWaitingForLandingTask->ReadyForActivation();
 }

@@ -20,4 +20,11 @@ public:
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
+	UFUNCTION()
+	void OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
+	TSubclassOf<class AHKTargetActor_Shot> TargetActorClass;
+
 };

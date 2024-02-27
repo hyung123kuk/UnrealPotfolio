@@ -2,6 +2,7 @@
 
 
 #include "AbilitySystem/Abilities/HKGameplayAbility_AttackHitCheck.h"
+#include "AbilitySystem/AbilityTask/HKAbilityTask_Shot.h"
 
 UHKGameplayAbility_AttackHitCheck::UHKGameplayAbility_AttackHitCheck()
 {
@@ -13,11 +14,15 @@ void UHKGameplayAbility_AttackHitCheck::ActivateAbility(const FGameplayAbilitySp
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	UE_LOG(LogTemp, Log, TEXT("AbilityHitCheck"));
+	UHKAbilityTask_Shot* AttackTraceTask = UHKAbilityTask_Shot::CreateTask(this, TargetActorClass);
+	AttackTraceTask->OnComplete.AddDynamic(this, &UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback);
+	AttackTraceTask->ReadyForActivation();
+}
 
+void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
+{
 
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;
-
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
 }

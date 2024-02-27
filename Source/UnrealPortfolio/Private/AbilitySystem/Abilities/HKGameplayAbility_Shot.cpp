@@ -4,6 +4,7 @@
 #include "AbilitySystem/Abilities/HKGameplayAbility_Shot.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Characters/HKPlayerCharacter.h"
+#include "AbilitySystem/AbilityTask/HKAbilityTask_Shot.h"
 
 UHKGameplayAbility_Shot::UHKGameplayAbility_Shot()
 {
@@ -23,6 +24,8 @@ void UHKGameplayAbility_Shot::ActivateAbility(const FGameplayAbilitySpecHandle H
 	PlayAttackTask->OnCompleted.AddDynamic(this, &UHKGameplayAbility_Shot::OnCompleteCallback);
 	PlayAttackTask->OnInterrupted.AddDynamic(this, &UHKGameplayAbility_Shot::OnInterruptedCallback);
 	PlayAttackTask->ReadyForActivation();
+
+
 }
 
 void UHKGameplayAbility_Shot::OnCompleteCallback()

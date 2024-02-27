@@ -8,7 +8,7 @@ UHKAbilityTask_Jump::UHKAbilityTask_Jump()
 {
 }
 
-UHKAbilityTask_Jump* UHKAbilityTask_Jump::CreateTast(UGameplayAbility* OwningAbility)
+UHKAbilityTask_Jump* UHKAbilityTask_Jump::CreateTask(UGameplayAbility* OwningAbility)
 {
 	UHKAbilityTask_Jump* NewTask = NewAbilityTask<UHKAbilityTask_Jump>(OwningAbility);
 	return NewTask;

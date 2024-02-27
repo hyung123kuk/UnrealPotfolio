@@ -43,7 +43,6 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 
-
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Main/Input/IMC_Gun.IMC_Gun'"));
 	if (InputMappingContextRef.Succeeded())
 	{
@@ -96,6 +95,7 @@ void AHKPlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
 }
 
 void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

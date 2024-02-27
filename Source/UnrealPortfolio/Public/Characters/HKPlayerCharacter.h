@@ -73,21 +73,23 @@ protected:
 
 //Ability Params
 protected:
-	UPROPERTY(EditAnywhere, Category = "AGAS")
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TObjectPtr<class UAbilitySystemComponent> ASC;
 
-	UPROPERTY(EditAnywhere, Category = "AGAS")
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TMap<int32, TSubclassOf<class UGameplayAbility>> StartInputAbilities;
 
-	UPROPERTY(EditAnywhere, Category = "AGAS")
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
 
 //Behaviour Params
 private:
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", meta = (AllowPrivateAccess = true))
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	FVector2D InputMoveValue;
 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", meta = (AllowPrivateAccess = true))
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	FRotator InputLookValue;
 
+
+	friend class AHKTargetActor_Shot;
 };

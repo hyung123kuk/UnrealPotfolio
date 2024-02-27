@@ -30,10 +30,10 @@ public:
 
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Health", Meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, Category = "AAHealth", Meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData Health;
-	UPROPERTY(BlueprintReadOnly, Category = "Health", Meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, Category = "AAHealth", Meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData MaxHealth;
-	UPROPERTY(BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, Category = "AAAttack", Meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData Damage;
 };

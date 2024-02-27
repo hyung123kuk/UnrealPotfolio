@@ -20,8 +20,8 @@ class UNREALPORTFOLIO_API UHKAbilityTask_Jump : public UAbilityTask
 public:
 	UHKAbilityTask_Jump();
 
-	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (DisplayName = "JumpAndWaitForLanding", HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UHKAbilityTask_Jump* CreateTast(UGameplayAbility* OwningAbility);
+	UFUNCTION(BlueprintCallable, Category = "AATask", meta = (DisplayName = "JumpTask", HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
+	static UHKAbilityTask_Jump* CreateTask(UGameplayAbility* OwningAbility);
 	
 	virtual void Activate() override;
 	virtual void OnDestroy(bool AbilityEnded) override;

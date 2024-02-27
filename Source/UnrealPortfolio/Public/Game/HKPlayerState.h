@@ -24,7 +24,7 @@ public:
 
 //Ability Params
 protected:
-	UPROPERTY(EditAnywhere, Category = "AGAS")
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TObjectPtr<UAbilitySystemComponent> ASC;
 	
 	UPROPERTY()
