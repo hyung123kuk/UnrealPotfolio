@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/Abilities/HKGameplayAbility_AttackHitCheck.h"
 #include "AbilitySystem/AbilityTask/HKAbilityTask_Shot.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 UHKGameplayAbility_AttackHitCheck::UHKGameplayAbility_AttackHitCheck()
 {
@@ -21,6 +22,18 @@ void UHKGameplayAbility_AttackHitCheck::ActivateAbility(const FGameplayAbilitySp
 
 void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
+	if (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, 0))
+	{
+		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
+
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
+		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackDamageEffect);
+		if (EffectSpecHandle.IsValid())
+		{
+			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+		}
+
+	}
 
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;

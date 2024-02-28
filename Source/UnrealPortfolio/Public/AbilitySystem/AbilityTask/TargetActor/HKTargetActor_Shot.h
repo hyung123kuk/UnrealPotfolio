@@ -21,4 +21,5 @@ public:
 
 protected:
 	virtual FGameplayAbilityTargetDataHandle MakeTargetData() const;
+
 };

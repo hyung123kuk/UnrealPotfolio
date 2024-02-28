@@ -28,9 +28,17 @@ public:
 	ATTRIBUTE_ACCESSORS(UHKCharacterAttributeSet, MaxHealth);
 	ATTRIBUTE_ACCESSORS(UHKCharacterAttributeSet, Damage);
 
+	virtual bool PreGameplayEffectExecute(struct FGameplayEffectModCallbackData& Data) override;
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
+
+private:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION()
+	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "AAHealth", Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadOnly, Category = "AAHealth", Meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData Health;
 	UPROPERTY(BlueprintReadOnly, Category = "AAHealth", Meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData MaxHealth;

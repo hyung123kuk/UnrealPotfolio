@@ -25,6 +25,9 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
+	TSubclassOf<class UGameplayEffect> AttackDamageEffect;
+
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TSubclassOf<class AHKTargetActor_Shot> TargetActorClass;
 
 };
