@@ -19,5 +19,9 @@ DECLARE_LOG_CATEGORY_EXTERN(LogABTeleport, Log, All);
 
 //NET_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("Begin"));
 
+// Collision
 #define CHANNEL_HKCHARACTER ECC_GameTraceChannel1
 #define CHANNEL_ATTACK ECC_GameTraceChannel2
+
+// TAG
+#define HKTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT FGameplayTag::RequestGameplayTag(FName("GameplayCue.Character.AttackHit"))

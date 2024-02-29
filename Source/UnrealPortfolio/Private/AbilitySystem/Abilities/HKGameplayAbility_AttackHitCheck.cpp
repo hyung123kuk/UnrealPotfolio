@@ -4,6 +4,8 @@
 #include "AbilitySystem/Abilities/HKGameplayAbility_AttackHitCheck.h"
 #include "AbilitySystem/AbilityTask/HKAbilityTask_Shot.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "UnrealPortfolio/UnrealPortfolio.h"
+#include "AbilitySystemComponent.h"
 
 UHKGameplayAbility_AttackHitCheck::UHKGameplayAbility_AttackHitCheck()
 {
@@ -28,9 +30,17 @@ void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbi
 
 		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
 		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackDamageEffect);
+
 		if (EffectSpecHandle.IsValid())
 		{
 			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+		
+			FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
+			CueContextHandle.AddHitResult(HitResult);
+			FGameplayCueParameters CueParam;
+			CueParam.EffectContext = CueContextHandle;
+
+			TargetASC->ExecuteGameplayCue(HKTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
 		}
 
 	}
