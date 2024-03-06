@@ -44,4 +44,5 @@ protected:
 	FGameplayAttributeData MaxHealth;
 	UPROPERTY(BlueprintReadOnly, Category = "AAAttack", Meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData Damage;
+
 };

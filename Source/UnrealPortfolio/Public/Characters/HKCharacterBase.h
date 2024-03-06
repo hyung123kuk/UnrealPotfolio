@@ -17,10 +17,15 @@ public:
 
 public:
 	FORCEINLINE virtual class UAnimMontage* GetShotMontage() const { return ShotMontage; }
+	FORCEINLINE virtual class UAnimMontage* GetDeadMontage() const { return DeadMontage; }
+
+protected:
 
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAAnimation")
 	TObjectPtr<class UAnimMontage> ShotMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAAnimation")
+	TObjectPtr<class UAnimMontage> DeadMontage;
 };

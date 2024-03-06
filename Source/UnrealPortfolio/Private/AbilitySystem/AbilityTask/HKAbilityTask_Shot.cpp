@@ -28,6 +28,7 @@ void UHKAbilityTask_Shot::Activate()
 	}
 
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
+
 	if (ASC)
 	{
 		const FTransform SpawnTransform = ASC->GetAvatarActor()->GetTransform();

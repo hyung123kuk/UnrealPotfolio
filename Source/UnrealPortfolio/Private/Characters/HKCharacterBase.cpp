@@ -19,6 +19,13 @@ AHKCharacterBase::AHKCharacterBase()
 		ShotMontage = ShotMontageRef.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Main/Animation/Montage/AM_Dead.AM_Dead'"));
+	if (DeadMontageRef.Succeeded())
+	{
+		DeadMontage = DeadMontageRef.Object;
+	}
+
+
 }
 
 

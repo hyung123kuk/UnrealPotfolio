@@ -4,6 +4,7 @@
 #include "AbilitySystem/AttributeSet/HKCharacterAttributeSet.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 UHKCharacterAttributeSet::UHKCharacterAttributeSet()
 	: MaxHealth(100.f),
@@ -29,10 +30,16 @@ void UHKCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
 
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
-		UE_LOG(LogTemp, Log, TEXT("Damage : %f"), GetDamage());
 		SetHealth(FMath::Clamp(GetHealth() - GetDamage(), 0.0f, GetMaxHealth()));
+		UE_LOG(LogTemp, Log, TEXT("Damage : %f"), GetDamage());
 		UE_LOG(LogTemp, Log, TEXT("Health : %f"), GetHealth());
 		SetDamage(0.0f);
+
+		if (GetHealth() < KINDA_SMALL_NUMBER)
+		{
+			FGameplayEventData PayloadData;
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningActor(), FGameplayTag::RequestGameplayTag(FName("Character.State.IsDead")), PayloadData);
+		}
 	}
 }
 
