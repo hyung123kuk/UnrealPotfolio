@@ -73,12 +73,29 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 		AttackAction = AttackActionRef.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UInputAction> ChangeWeaponActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_ChangeWeapon.IA_ChangeWeapon'"));
+	if (ChangeWeaponActionRef.Succeeded())
+	{
+		ChangeWeaponAction = ChangeWeaponActionRef.Object;
+	}
+
 	ConstructorHelpers::FClassFinder<UHKAnimInstance> AnimInstanceRef(TEXT("/Script/Engine.Blueprint'/Game/Main/Blueprints/Animation/BP_AnimInstance.BP_AnimInstance_C'"));
 	if (AnimInstanceRef.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceRef.Class);
 	}
 
+	Weapon_L = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_L"));
+	Weapon_L->SetupAttachment(GetMesh(), TEXT("WeaponSocket_L"));
+	Weapon_R = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_R"));
+	Weapon_R->SetupAttachment(GetMesh(), TEXT("WeaponSocket_R"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WeaponMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Main/Mesh/Weapon/SK_Pistol.SK_Pistol'"));
+	if (WeaponMeshRef.Object)
+	{
+		WeaponMesh = WeaponMeshRef.Object;
+	}
+	Weapon_L->SetSkeletalMesh(WeaponMesh);
+	Weapon_R->SetSkeletalMesh(WeaponMesh);
 }
 
 void AHKPlayerCharacter::BeginPlay()
@@ -95,7 +112,6 @@ void AHKPlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-
 }
 
 void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -111,8 +127,8 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	{
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 1);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 2);		
+		//EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 3);
 	}
-
 }
 
 void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -121,18 +137,13 @@ void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 	DOREPLIFETIME(ThisClass, InputMoveValue);
 	DOREPLIFETIME(ThisClass, InputLookValue);
-
 }
 
 void AHKPlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	AHKPlayerState* GASPS = GetPlayerState<AHKPlayerState>();
-	if (GASPS)
-	{
-		ASC = GASPS->GetAbilitySystemComponent();
-		ASC->InitAbilityActorInfo(GASPS, this);
-	}
+
+	InitAbilityActorInfo();
 
 	for (const auto& StartAbility : StartAbilities)
 	{
@@ -151,18 +162,23 @@ void AHKPlayerCharacter::PossessedBy(AController* NewController)
 void AHKPlayerCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState(); 
-	AHKPlayerState* GASPS = GetPlayerState<AHKPlayerState>();
-	if (GASPS)
-	{
-		ASC = GASPS->GetAbilitySystemComponent();
-		ASC->InitAbilityActorInfo(GASPS, this);
 
-		APlayerController* PlayerController = Cast<APlayerController>(GetController());
-		if (PlayerController)
-		{
-			PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
-		}
+	InitAbilityActorInfo();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
+}
+
+void AHKPlayerCharacter::InitAbilityActorInfo()
+{
+	AHKPlayerState* GASPS = GetPlayerState<AHKPlayerState>();
+	check(GASPS);
+	ASC = GASPS->GetAbilitySystemComponent();
+	ASC->InitAbilityActorInfo(GASPS, this);
+	CharacterAttributeSet = GASPS->GetAttributeSet();
 }
 
 UAbilitySystemComponent* AHKPlayerCharacter::GetAbilitySystemComponent() const

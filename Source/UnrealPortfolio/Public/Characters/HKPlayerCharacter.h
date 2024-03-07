@@ -32,6 +32,7 @@ protected:
 
 //Ability Func
 protected:	
+	void InitAbilityActorInfo();
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	void GASInputPressed(int32 InputId);
 	void GASInputReleased(int32 InputId);
@@ -57,6 +58,15 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWeapon", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> Weapon_L;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWeapon", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> Weapon_R;
+
+	UPROPERTY(EditAnywhere, Category = Weapon)
+	TObjectPtr<class USkeletalMesh> WeaponMesh;
+
 //Input Action
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
@@ -71,10 +81,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ChangeWeaponAction;
+
 //Ability Params
 protected:
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TObjectPtr<class UAbilitySystemComponent> ASC;
+
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
+	TObjectPtr<class UHKCharacterAttributeSet> CharacterAttributeSet;
 
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TMap<int32, TSubclassOf<class UGameplayAbility>> StartInputAbilities;

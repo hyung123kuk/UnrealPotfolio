@@ -47,7 +47,7 @@ void UHKCharacterAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION_NOTIFY(UHKCharacterAttributeSet, Health, COND_None, REPNOTIFY_OnChanged);
+	DOREPLIFETIME_CONDITION_NOTIFY(UHKCharacterAttributeSet, Health, COND_None, REPNOTIFY_Always);
 }
 
 void UHKCharacterAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)

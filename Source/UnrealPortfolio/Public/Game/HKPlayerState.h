@@ -7,6 +7,8 @@
 #include "AbilitySystemInterface.h"
 #include "HKPlayerState.generated.h"
 
+class UHKCharacterAttributeSet;
+
 /**
  * 
  */
@@ -21,12 +23,12 @@ public:
 //Ability Func
 public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
+	UHKCharacterAttributeSet* GetAttributeSet() const { return CharacterAttributeSet; }
 //Ability Params
 protected:
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TObjectPtr<UAbilitySystemComponent> ASC;
 	
-	UPROPERTY()
-	TObjectPtr<class UHKCharacterAttributeSet> CharacterAttributeSet;
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
+	TObjectPtr<UHKCharacterAttributeSet> CharacterAttributeSet;
 };

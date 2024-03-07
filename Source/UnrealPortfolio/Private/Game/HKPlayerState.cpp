@@ -9,7 +9,7 @@ AHKPlayerState::AHKPlayerState()
 {
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
 	ASC->SetIsReplicated(true);
-	ASC->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	ASC->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 	CharacterAttributeSet = CreateDefaultSubobject<UHKCharacterAttributeSet>(TEXT("AttributeSet"));
 }
