@@ -15,6 +15,8 @@
 #include "Engine/Engine.h"
 #include "AbilitySystemComponent.h"
 #include "Game/HKPlayerState.h"
+#include "Item/HKWeapon.h"
+#include "AbilitySystem/Abilities/HKGameplayAbility_WeaponSwap.h"
 
 AHKPlayerCharacter::AHKPlayerCharacter()
 {
@@ -84,18 +86,9 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceRef.Class);
 	}
-
-	Weapon_L = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_L"));
-	Weapon_L->SetupAttachment(GetMesh(), TEXT("WeaponSocket_L"));
-	Weapon_R = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_R"));
-	Weapon_R->SetupAttachment(GetMesh(), TEXT("WeaponSocket_R"));
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WeaponMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Main/Mesh/Weapon/SK_Pistol.SK_Pistol'"));
-	if (WeaponMeshRef.Object)
-	{
-		WeaponMesh = WeaponMeshRef.Object;
-	}
-	Weapon_L->SetSkeletalMesh(WeaponMesh);
-	Weapon_R->SetSkeletalMesh(WeaponMesh);
+	WeaponSocket_R = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_R"));
+	WeaponSocket_R->SetupAttachment(GetMesh(), TEXT("WeaponSocket_R"));
+	WeaponNum = 0;
 }
 
 void AHKPlayerCharacter::BeginPlay()
@@ -127,7 +120,7 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	{
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 1);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 2);		
-		//EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 3);
+		EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::ChangeWeapon);
 	}
 }
 
@@ -137,6 +130,7 @@ void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 	DOREPLIFETIME(ThisClass, InputMoveValue);
 	DOREPLIFETIME(ThisClass, InputLookValue);
+	DOREPLIFETIME(ThisClass, WeaponNum);
 }
 
 void AHKPlayerCharacter::PossessedBy(AController* NewController)
@@ -155,6 +149,14 @@ void AHKPlayerCharacter::PossessedBy(AController* NewController)
 	{
 		FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
 		StartSpec.InputID = StartInputAbility.Key;
+		ASC->GiveAbility(StartSpec);
+	}
+
+	for (const auto& SwapWeapon : SwapWeapons)
+	{
+		auto Swap = SwapWeapon.Value;
+		
+		FGameplayAbilitySpec StartSpec(Cast<AHKWeapon>(Swap->GetDefaultObject())->SwapAbility);
 		ASC->GiveAbility(StartSpec);
 	}
 }
@@ -233,15 +235,55 @@ void AHKPlayerCharacter::Move(const FInputActionValue& Value)
 	UpdateInputMoveValue_Server(InputMoveValue);
 }
 
-void AHKPlayerCharacter::Look(const FInputActionValue& InValue)
+void AHKPlayerCharacter::Look(const FInputActionValue& Value)
 {
-	FVector2D LookAxisVector = InValue.Get<FVector2D>();
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
 
 	InputLookValue = GetControlRotation();
 	UpdateInputLookValue_Server(InputLookValue);
+}
+
+void AHKPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
+{
+	int32 InputKey = static_cast<int32>(Value.Get<float>());
+
+	if (WeaponNum == InputKey)
+		return;
+
+	AHKWeapon* NewWeapon = Cast<AHKWeapon>(SwapWeapons.Find(InputKey)->GetDefaultObject());
+
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(NewWeapon->SwapAbility);
+	UpdateChangeWeapon_Server(InputKey);
+
+	if (Spec)
+	{
+		if (Spec->IsActive())
+		{
+			ASC->AbilitySpecInputPressed(*Spec);
+		}
+		else
+		{
+			ASC->TryActivateAbility(Spec->Handle);
+		}
+
+	}
+}
+
+void AHKPlayerCharacter::OnRep_WeaponNum()
+{
+	EquipWeapon = Cast<AHKWeapon>(SwapWeapons.Find(WeaponNum)->GetDefaultObject());
+	WeaponSocket_R->SetSkeletalMesh(&EquipWeapon->GetWeaponMesh());
+	SetShotMontage(&EquipWeapon->GetShotMontage());
+}
+
+void AHKPlayerCharacter::UpdateChangeWeapon_Server_Implementation(const int32& InputKey)
+{
+	WeaponNum = InputKey;
+	EquipWeapon = Cast<AHKWeapon>(SwapWeapons.Find(WeaponNum)->GetDefaultObject());
+	SetShotMontage(&EquipWeapon->GetShotMontage());
 }
 
 void AHKPlayerCharacter::UpdateInputMoveValue_Server_Implementation(const FVector2D& OwnerInputMoveValue)

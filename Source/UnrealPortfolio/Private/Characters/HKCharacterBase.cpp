@@ -12,20 +12,24 @@ AHKCharacterBase::AHKCharacterBase()
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
-
-	ConstructorHelpers::FObjectFinder<UAnimMontage> ShotMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Main/Animation/Montage/AM_Shot.AM_Shot'"));
+	
+	ConstructorHelpers::FObjectFinder<UAnimMontage> ShotMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Main/Animation/Rifle/AM_Shot_Rifle.AM_Shot_Rifle'"));
 	if (ShotMontageRef.Succeeded())
 	{
 		ShotMontage = ShotMontageRef.Object;
 	}
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Main/Animation/Montage/AM_Dead.AM_Dead'"));
+	ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Main/Animation/AM_Dead.AM_Dead'"));
 	if (DeadMontageRef.Succeeded())
 	{
 		DeadMontage = DeadMontageRef.Object;
 	}
 
-
+	ConstructorHelpers::FObjectFinder<UAnimMontage> WeaponSwapMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Main/Animation/AM_SwapWeapon.AM_SwapWeapon'"));
+	if (WeaponSwapMontageRef.Succeeded())
+	{
+		SwapMontage = WeaponSwapMontageRef.Object;
+	}
 }
 
 

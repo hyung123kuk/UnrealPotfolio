@@ -8,6 +8,8 @@
 #include "AbilitySystemInterface.h"
 #include "HKPlayerCharacter.generated.h"
 
+class AHKWeapon;
+
 /**
  * 
  */
@@ -20,8 +22,9 @@ public:
 	AHKPlayerCharacter();
 
 	FORCEINLINE const FVector2D& GetMoveValue() const { return InputMoveValue; }
-
 	FORCEINLINE const FRotator& GetLookValue() const { return InputLookValue; }
+	AHKWeapon* GetWeapon() const { return EquipWeapon; }
+	
 
 protected:
 	virtual void BeginPlay() override;
@@ -40,13 +43,20 @@ protected:
 //Behaviour Func
 private:
 	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& InValue);
+	void Look(const FInputActionValue& Value);
+	UFUNCTION()
+	void ChangeWeapon(const FInputActionValue& Value);
 
 	UFUNCTION(Server, Unreliable)
 	void UpdateInputMoveValue_Server(const FVector2D& OwnerInputMoveValue);
 	UFUNCTION(Server, Unreliable)
 	void UpdateInputLookValue_Server(const FRotator& OwnerInputLookValue);
 
+	
+	UFUNCTION(Server, Reliable)
+	void UpdateChangeWeapon_Server(const int32& InputKey);
+	UFUNCTION()
+	void OnRep_WeaponNum();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AACamera", Meta = (AllowPrivateAccess = "true"))
@@ -58,14 +68,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWeapon", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USkeletalMeshComponent> Weapon_L;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "AAWeapon", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> WeaponSocket_R;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWeapon", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USkeletalMeshComponent> Weapon_R;
-
-	UPROPERTY(EditAnywhere, Category = Weapon)
-	TObjectPtr<class USkeletalMesh> WeaponMesh;
+	UPROPERTY(EditAnywhere, Category = "AAWeapon")
+	TObjectPtr<class AHKWeapon> EquipWeapon;
 
 //Input Action
 protected:
@@ -98,6 +105,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
 
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
+	TMap<int32, TSubclassOf<class AHKWeapon>> SwapWeapons;
+
+
 //Behaviour Params
 private:
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
@@ -106,6 +117,8 @@ private:
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	FRotator InputLookValue;
 
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponNum, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
+	int32 WeaponNum;
 
 	friend class AHKTargetActor_Shot;
 };

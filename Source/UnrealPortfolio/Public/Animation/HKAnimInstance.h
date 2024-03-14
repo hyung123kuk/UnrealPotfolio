@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Item/HKWeapon.h"
 #include "HKAnimInstance.generated.h"
 
 /**
@@ -42,5 +43,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAAnimation")
 	FVector2D InputMoveValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAAnimation")
+	uint8 bIsAttack : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAAnimation")
+	EWeaponType WeaponType = EWeaponType::MeleeWeapon;
 
 };

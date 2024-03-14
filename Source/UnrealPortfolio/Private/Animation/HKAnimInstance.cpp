@@ -5,9 +5,13 @@
 #include "GameFramework/Character.h"
 #include "Characters/HKPlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+
 
 UHKAnimInstance::UHKAnimInstance()
 {
+	bIsAttack = false;
 }
 
 void UHKAnimInstance::NativeInitializeAnimation()
@@ -35,7 +39,17 @@ void UHKAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			bool isMove = Velocity != FVector().Zero();
 			InputMoveValue = isMove? PlayerCharacter->GetMoveValue():FVector2D().Zero();
-
+			
+			UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningActor());
+			if (ASC)
+			{
+				bIsAttack = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Character.State.IsShot")));
+			}
+			AHKWeapon* Weapon = PlayerCharacter->GetWeapon();
+			if (Weapon)
+			{
+				WeaponType = Weapon->GetWeaponType();
+			}
 			ControlRotation = PlayerCharacter->GetLookValue();
 		}
 	}

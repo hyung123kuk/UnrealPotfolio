@@ -24,8 +24,6 @@ void UHKGameplayAbility_Shot::ActivateAbility(const FGameplayAbilitySpecHandle H
 	PlayAttackTask->OnCompleted.AddDynamic(this, &UHKGameplayAbility_Shot::OnCompleteCallback);
 	PlayAttackTask->OnInterrupted.AddDynamic(this, &UHKGameplayAbility_Shot::OnInterruptedCallback);
 	PlayAttackTask->ReadyForActivation();
-
-
 }
 
 void UHKGameplayAbility_Shot::OnCompleteCallback()

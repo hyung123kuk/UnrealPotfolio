@@ -7,11 +7,11 @@ void AHKPlayerControllerBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	bShowMouseCursor = true;
-	DefaultMouseCursor = EMouseCursor::None;
+	//bShowMouseCursor = true;
+	//DefaultMouseCursor = EMouseCursor::None;
 
 	FInputModeGameAndUI InputModeData;
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	InputModeData.SetHideCursorDuringCapture(false);
-	SetInputMode(InputModeData);
+	//SetInputMode(InputModeData);
 }
