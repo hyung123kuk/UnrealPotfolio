@@ -8,6 +8,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "UnrealPortfolio/UnrealPortfolio.h"
+#include "Item/HKWeapon.h"
+#include "Components/SkeletalMeshComponent.h"
 
 AHKTargetActor_Shot::AHKTargetActor_Shot()
 {
@@ -35,15 +37,14 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 	FHitResult HitResult;
 	UCameraComponent* CameraComponent = Character->CameraComponent;
 	FVector CameraStartLocation = CameraComponent->GetComponentLocation();
-	FVector CameraEndLocation = CameraStartLocation + CameraComponent->GetForwardVector() * 5000.f;
+	FVector CameraEndLocation = Character->GetPawnViewLocation() + CameraComponent->GetForwardVector() * 5000.f;
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 	QueryParams.AddIgnoredComponent((const UPrimitiveComponent*)(CameraComponent));
 	QueryParams.bTraceComplex = true;
 
-	FVector MuzzleLocation = Character->GetMesh()->GetSocketLocation(FName("Muzzle_01"));
-
+	FVector MuzzleLocation = Character->GetMesh()->GetSocketLocation("MuzzleFlash");
 	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLocation, CameraEndLocation, CHANNEL_ATTACK, QueryParams);
 	
 	if (HitDetected == true)

@@ -35,7 +35,7 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
-	CameraComponent->SetRelativeLocation(FVector(0.f, 60.f, 20.f));
+	CameraComponent->SetRelativeLocation(FVector(0.f, 60.f, 10.f));
 	CameraComponent->bUsePawnControlRotation = false;
 
 	bUseControllerRotationPitch = false;
@@ -122,6 +122,8 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 2);		
 		EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::ChangeWeapon);
 	}
+
+	ChangeWeapon(1);
 }
 
 void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -254,6 +256,9 @@ void AHKPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
 		return;
 
 	AHKWeapon* NewWeapon = Cast<AHKWeapon>(SwapWeapons.Find(InputKey)->GetDefaultObject());
+
+	if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Character.State.IsShot"))))
+		return;
 
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(NewWeapon->SwapAbility);
 	UpdateChangeWeapon_Server(InputKey);

@@ -27,6 +27,7 @@ public:
 	AHKWeapon();
 
 	USkeletalMesh& GetWeaponMesh() const { return *WeaponMesh->GetSkeletalMeshAsset(); }
+	USkeletalMeshComponent* GetWeaponMeshComponent() const { return WeaponMesh; }
 	UAnimMontage& GetShotMontage() const { return *ShotMontage; }
 	const FORCEINLINE EWeaponType& GetWeaponType() const { return WeaponType; }
 
@@ -34,9 +35,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
 	float Damage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
-	float AttackSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
 	TObjectPtr<class UAnimMontage> ShotMontage;
