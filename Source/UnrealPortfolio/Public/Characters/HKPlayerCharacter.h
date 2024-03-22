@@ -44,6 +44,8 @@ protected:
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Zoom(const FInputActionValue& Value);
+
 	UFUNCTION()
 	void ChangeWeapon(const FInputActionValue& Value);
 
@@ -90,6 +92,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ChangeWeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ZoomAction;
 
 //Ability Params
 protected:

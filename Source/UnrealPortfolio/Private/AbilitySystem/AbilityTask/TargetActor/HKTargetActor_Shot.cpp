@@ -44,7 +44,18 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 	QueryParams.AddIgnoredComponent((const UPrimitiveComponent*)(CameraComponent));
 	QueryParams.bTraceComplex = true;
 
-	FVector MuzzleLocation = Character->GetMesh()->GetSocketLocation("MuzzleFlash");
+	FVector MuzzleLocation;
+
+	if (Character->GetAbilitySystemComponent()->HasMatchingGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM))
+	{
+		MuzzleLocation = CameraStartLocation;
+		Character->Zoom(0);
+	}
+	else
+	{
+		MuzzleLocation = Character->GetMesh()->GetSocketLocation("MuzzleFlash");
+	}
+
 	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLocation, CameraEndLocation, CHANNEL_ATTACK, QueryParams);
 	
 	if (HitDetected == true)

@@ -81,6 +81,12 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 		ChangeWeaponAction = ChangeWeaponActionRef.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UInputAction> ZoomActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_Zoom.IA_Zoom'"));
+	if (ZoomActionRef.Succeeded())
+	{
+		ZoomAction = ZoomActionRef.Object;
+	}
+
 	ConstructorHelpers::FClassFinder<UHKAnimInstance> AnimInstanceRef(TEXT("/Script/Engine.Blueprint'/Game/Main/Blueprints/Animation/BP_AnimInstance.BP_AnimInstance_C'"));
 	if (AnimInstanceRef.Succeeded())
 	{
@@ -115,6 +121,7 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
+	EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Started, this, &ThisClass::Zoom);
 
 	if (IsValid(ASC))
 	{
@@ -246,6 +253,27 @@ void AHKPlayerCharacter::Look(const FInputActionValue& Value)
 
 	InputLookValue = GetControlRotation();
 	UpdateInputLookValue_Server(InputLookValue);
+}
+
+void AHKPlayerCharacter::Zoom(const FInputActionValue& Value)
+{
+
+	if (!(EquipWeapon->GetWeaponType() == EWeaponType::Sniper))
+		return;
+
+	if (ASC->HasMatchingGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM))
+	{
+		SpringArmComponent->TargetArmLength = 400.0f;
+		CameraComponent->FieldOfView = 90.f;
+		ASC->RemoveLooseGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM);
+	}
+	else
+	{
+		SpringArmComponent->TargetArmLength = 0.f;
+		CameraComponent->FieldOfView = 40.f;
+		ASC->AddLooseGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM);
+	}
+	
 }
 
 void AHKPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
