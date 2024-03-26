@@ -2,6 +2,7 @@
 
 
 #include "Controllers/HKPlayerControllerBase.h"
+#include "Camera/CameraShakeBase.h"
 
 void AHKPlayerControllerBase::BeginPlay()
 {
@@ -15,3 +16,9 @@ void AHKPlayerControllerBase::BeginPlay()
 	InputModeData.SetHideCursorDuringCapture(false);
 	//SetInputMode(InputModeData);
 }
+
+void AHKPlayerControllerBase::CameraShake(float Strength)
+{
+	ClientPlayCameraShake(FireShake, Strength);
+}
+

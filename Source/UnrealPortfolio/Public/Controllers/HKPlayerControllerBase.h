@@ -14,6 +14,14 @@ class UNREALPORTFOLIO_API AHKPlayerControllerBase : public APlayerController
 {
 	GENERATED_BODY()
 	
+protected:
 	void BeginPlay() override;
 	
+public:
+	void CameraShake(float Strength);
+
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AACamera", Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class UCameraShakeBase> FireShake;
+
 };

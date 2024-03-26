@@ -66,7 +66,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AACamera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> CameraComponent;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
@@ -126,4 +126,5 @@ private:
 	int32 WeaponNum;
 
 	friend class AHKTargetActor_Shot;
+	friend class AHKTargetActor_MultipleShots;
 };

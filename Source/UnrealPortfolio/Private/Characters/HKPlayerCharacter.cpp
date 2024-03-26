@@ -283,6 +283,9 @@ void AHKPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
 	if (WeaponNum == InputKey)
 		return;
 
+	if (!ASC)
+		return;
+
 	AHKWeapon* NewWeapon = Cast<AHKWeapon>(SwapWeapons.Find(InputKey)->GetDefaultObject());
 
 	if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Character.State.IsShot"))))

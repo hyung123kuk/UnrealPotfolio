@@ -6,6 +6,8 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "UnrealPortfolio/UnrealPortfolio.h"
 #include "AbilitySystemComponent.h"
+#include "Characters/HKPlayerCharacter.h"
+#include "Item/HKWeapon.h"
 
 UHKGameplayAbility_AttackHitCheck::UHKGameplayAbility_AttackHitCheck()
 {
@@ -16,8 +18,9 @@ UHKGameplayAbility_AttackHitCheck::UHKGameplayAbility_AttackHitCheck()
 void UHKGameplayAbility_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	UHKAbilityTask_Shot* AttackTraceTask = UHKAbilityTask_Shot::CreateTask(this, TargetActorClass);
+	
+	AHKPlayerCharacter* PlayerCharacter = Cast<AHKPlayerCharacter>(ActorInfo->AvatarActor.Get());
+	UHKAbilityTask_Shot* AttackTraceTask = UHKAbilityTask_Shot::CreateTask(this, PlayerCharacter->GetWeapon()->GetTargetActor());
 	AttackTraceTask->OnComplete.AddDynamic(this, &UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback);
 	AttackTraceTask->ReadyForActivation();
 }
@@ -26,21 +29,28 @@ void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbi
 {
 	if (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, 0))
 	{
-		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
+		int HitTargetCount = TargetDataHandle.Num();
 
-		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
-		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackDamageEffect);
-
-		if (EffectSpecHandle.IsValid())
+		for (int i = 0; i < HitTargetCount; i++)
 		{
-			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
-		
-			FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
-			CueContextHandle.AddHitResult(HitResult);
-			FGameplayCueParameters CueParam;
-			CueParam.EffectContext = CueContextHandle;
+			FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, i);
+			
+			UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
+			FGameplayEffectContextHandle ContextHandle = TargetASC->MakeEffectContext();
+			ContextHandle.AddInstigator(GetAvatarActorFromActorInfo(), GetAvatarActorFromActorInfo());
+			const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(AttackDamageEffect, 1.0f, ContextHandle);
 
-			TargetASC->ExecuteGameplayCue(HKTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
+			if (EffectSpecHandle.IsValid())
+			{
+				FGameplayAbilityTargetDataHandle ApplyTargetHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromHitResult(HitResult);
+				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, ApplyTargetHandle);
+
+				FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
+				CueContextHandle.AddHitResult(HitResult);
+				FGameplayCueParameters CueParam;
+				CueParam.EffectContext = CueContextHandle;
+				TargetASC->ExecuteGameplayCue(HKTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
+			}
 		}
 
 	}

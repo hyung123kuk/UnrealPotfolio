@@ -10,6 +10,7 @@
 #include "UnrealPortfolio/UnrealPortfolio.h"
 #include "Item/HKWeapon.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AHKTargetActor_Shot::AHKTargetActor_Shot()
 {
@@ -34,18 +35,15 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 {
 	AHKPlayerCharacter* Character = CastChecked<AHKPlayerCharacter>(SourceActor);
 
-	FHitResult HitResult;
-	UCameraComponent* CameraComponent = Character->CameraComponent;
-	FVector CameraStartLocation = CameraComponent->GetComponentLocation();
-	FVector CameraEndLocation = Character->GetPawnViewLocation() + CameraComponent->GetForwardVector() * 5000.f;
-
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
-	QueryParams.AddIgnoredComponent((const UPrimitiveComponent*)(CameraComponent));
-	QueryParams.bTraceComplex = true;
-
+	FGameplayAbilityTargetDataHandle DataHandle;
 	FVector MuzzleLocation;
 
+	const UCameraComponent* CameraComponent = Character->CameraComponent;
+	const AHKWeapon* Weapon = Character->GetWeapon();
+
+	const FVector CameraStartLocation = CameraComponent->GetComponentLocation();
+
+	//스나이퍼 줌일때 공격 시작점은 카메라 시작점으로
 	if (Character->GetAbilitySystemComponent()->HasMatchingGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM))
 	{
 		MuzzleLocation = CameraStartLocation;
@@ -56,26 +54,38 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 		MuzzleLocation = Character->GetMesh()->GetSocketLocation("MuzzleFlash");
 	}
 
-	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLocation, CameraEndLocation, CHANNEL_ATTACK, QueryParams);
-	
-	if (HitDetected == true)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Hit True"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("Hit False"));
-	}
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(SourceActor);
+	QueryParams.bTraceComplex = true;
 
-
-	FGameplayAbilityTargetDataHandle DataHandle;
-	if (HitDetected)
+	for (int32 BulletIndex = 0; BulletIndex < Weapon->GetBulletsPerCartridge(); ++BulletIndex)
 	{
-		FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
-		DataHandle.Add(TargetData);
-	}
+		FHitResult HitResult;
+		const FVector RandPos = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(CameraComponent->GetForwardVector(), Weapon->GetBulletSpreadAngle());
+		const FVector BulletEndLocation = Character->GetPawnViewLocation() + (CameraComponent->GetForwardVector() + RandPos) * Weapon->GetMaxDamageRange();
+		const bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLocation, BulletEndLocation, CHANNEL_ATTACK, QueryParams);
 
-	DrawDebugLine(GetWorld(), MuzzleLocation, CameraEndLocation, FColor(255, 255, 255, 64), false, 0.1f, 0U, 0.5f);
+		if (HitDetected)
+		{
+			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
+			DataHandle.Add(TargetData);
+		}
+
+		#pragma region Debug
+
+		DrawDebugLine(GetWorld(), MuzzleLocation, BulletEndLocation, FColor(255, 255, 255, 64), false, 0.1f, 0U, 0.5f);
+		if (HitDetected == true)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Hit True"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Hit False"));
+		}
+
+		#pragma endregion
+
+	}
 
 	return DataHandle;
 }
