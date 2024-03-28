@@ -11,6 +11,7 @@
 #include "Item/HKWeapon.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AHKTargetActor_Shot::AHKTargetActor_Shot()
 {
@@ -33,7 +34,7 @@ void AHKTargetActor_Shot::ConfirmTargetingAndContinue()
 
 FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 {
-	AHKPlayerCharacter* Character = CastChecked<AHKPlayerCharacter>(SourceActor);
+	AHKPlayerCharacter* Character = CastChecked<AHKPlayerCharacter>(SourceActor);							
 
 	FGameplayAbilityTargetDataHandle DataHandle;
 	FVector MuzzleLocation;
@@ -76,13 +77,9 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 		DrawDebugLine(GetWorld(), MuzzleLocation, BulletEndLocation, FColor(255, 255, 255, 64), false, 0.1f, 0U, 0.5f);
 		if (HitDetected == true)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Hit True"));
+			UE_LOG(LogTemp, Log, TEXT("%s"), *HitResult.BoneName.ToString());
+			DrawDebugSphere(GetWorld(), HitResult.Location, 3.f, 16, FColor(255, 0, 0, 255), true, 20.f, 0U, 5.f);
 		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("Hit False"));
-		}
-
 		#pragma endregion
 
 	}

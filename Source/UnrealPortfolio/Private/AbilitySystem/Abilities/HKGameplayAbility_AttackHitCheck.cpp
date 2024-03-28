@@ -8,6 +8,7 @@
 #include "AbilitySystemComponent.h"
 #include "Characters/HKPlayerCharacter.h"
 #include "Item/HKWeapon.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UHKGameplayAbility_AttackHitCheck::UHKGameplayAbility_AttackHitCheck()
 {
@@ -27,6 +28,7 @@ void UHKGameplayAbility_AttackHitCheck::ActivateAbility(const FGameplayAbilitySp
 
 void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
+
 	if (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, 0))
 	{
 		int HitTargetCount = TargetDataHandle.Num();
@@ -35,10 +37,12 @@ void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbi
 		{
 			FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, i);
 			
+			float EffectLevel = ConfirmEffectLevelByBoneName(HitResult.BoneName.ToString());
+
 			UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
 			FGameplayEffectContextHandle ContextHandle = TargetASC->MakeEffectContext();
 			ContextHandle.AddInstigator(GetAvatarActorFromActorInfo(), GetAvatarActorFromActorInfo());
-			const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(AttackDamageEffect, 1.0f, ContextHandle);
+			const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(AttackDamageEffect, EffectLevel, ContextHandle);
 
 			if (EffectSpecHandle.IsValid())
 			{
@@ -58,4 +62,18 @@ void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbi
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
+}
+
+float UHKGameplayAbility_AttackHitCheck::ConfirmEffectLevelByBoneName(FString BoneNameString) const
+{
+	if (BoneNameString.Equals(FString(TEXT("HEAD")), ESearchCase::IgnoreCase))
+	{
+		return 2.f;
+	}
+	else if (BoneNameString.Contains(FString(TEXT("SPINE")),ESearchCase::IgnoreCase))
+	{
+		return 1.5f;
+	}
+
+	return 1.f;
 }

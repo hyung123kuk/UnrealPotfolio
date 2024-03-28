@@ -27,10 +27,15 @@ class UNREALPORTFOLIO_API AHKWeapon : public AActor
 
 public:
 	AHKWeapon();
+	bool LoadedBullet();
+	void Reload();
+	bool CanReload();
 
 	USkeletalMesh& GetWeaponMesh() const { return *WeaponMesh->GetSkeletalMeshAsset(); }
 	USkeletalMeshComponent* GetWeaponMeshComponent() const { return WeaponMesh; }
 	UAnimMontage& GetShotMontage() const { return *ShotMontage; }
+	UAnimMontage& GetReloadMontage() const { return *ReloadMontage; }
+	UAnimMontage& GetSwapMontage() const { return *SwapMontage; }
 	TSubclassOf<class AHKTargetActor_Shot> GetTargetActor() const { return TargetActor; }
 
 	const FORCEINLINE EWeaponType& GetWeaponType() const { return WeaponType; }
@@ -39,6 +44,9 @@ public:
 	const FORCEINLINE float GetBulletSpreadAngle() const { return BulletSpreadAngle; }
 	const FORCEINLINE float GetMaxDamageRange() const { return MaxDamageRange; }
 	const FORCEINLINE int32 GetBulletsPerCartridge() const { return BulletsPerCartridge; }
+	const FORCEINLINE int32 GetLoadedBullets() const { return LoadedBullets; }
+	const FORCEINLINE int32 GetMaximumLoadedBullets() const { return MaximumLoadedBullets; }
+	const FORCEINLINE int32 GetRemainBullets() const { return RemainBullets; }
 
 protected:
 
@@ -58,7 +66,22 @@ protected:
 	int32 BulletsPerCartridge;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	int32 LoadedBullets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	int32 MaximumLoadedBullets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	int32 RemainBullets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
 	TObjectPtr<class UAnimMontage> ShotMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	TObjectPtr<class UAnimMontage> ReloadMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	TObjectPtr<class UAnimMontage> SwapMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;

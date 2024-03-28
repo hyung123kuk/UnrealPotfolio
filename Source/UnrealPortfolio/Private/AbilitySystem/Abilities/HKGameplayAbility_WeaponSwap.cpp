@@ -18,7 +18,7 @@ void UHKGameplayAbility_WeaponSwap::ActivateAbility(const FGameplayAbilitySpecHa
 {
 	AHKPlayerCharacter* PlayerCharacter = Cast<AHKPlayerCharacter>(ActorInfo->AvatarActor.Get());
 
-	FName SectionName = *FString::Printf(TEXT("RifleChange"));
+	FName SectionName = *FString::Printf(TEXT("Default"));
 
 	UAbilityTask_PlayMontageAndWait* SwapMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlaySwap"), PlayerCharacter->GetSwapMontage(), 1.0f, SectionName);
 	SwapMontageTask->OnCompleted.AddDynamic(this, &UHKGameplayAbility_WeaponSwap::OnCompleteCallback);

@@ -25,7 +25,7 @@ AHKCharacterBase::AHKCharacterBase()
 		DeadMontage = DeadMontageRef.Object;
 	}
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage> WeaponSwapMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Main/Animation/AM_SwapWeapon.AM_SwapWeapon'"));
+	ConstructorHelpers::FObjectFinder<UAnimMontage> WeaponSwapMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Main/Animation/Rifle/AM_SwapWeapon_Rifle.AM_SwapWeapon_Rifle'"));
 	if (WeaponSwapMontageRef.Succeeded())
 	{
 		SwapMontage = WeaponSwapMontageRef.Object;

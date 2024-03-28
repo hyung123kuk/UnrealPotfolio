@@ -13,11 +13,12 @@ UHKGameplayCue_Dead::UHKGameplayCue_Dead()
 bool UHKGameplayCue_Dead::OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters) const
 {
 	// TODO : Dead Effect
-	ACharacter* Characrter = Cast<ACharacter>(Target);
-	if (Characrter)
+	ACharacter* Character = Cast<ACharacter>(Target);
+	if (Character)
 	{
-		Characrter->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		Characrter->GetMesh()->SetSimulatePhysics(true);
+		Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Character->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Character->GetMesh()->SetSimulatePhysics(true);
 	}
 
 

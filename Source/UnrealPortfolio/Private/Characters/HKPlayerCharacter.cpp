@@ -87,6 +87,12 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 		ZoomAction = ZoomActionRef.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UInputAction> ReloadActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Main/Input/InputAction/IA_Reload.IA_Reload'"));
+	if (ReloadActionRef.Succeeded())
+	{
+		ReloadAction = ReloadActionRef.Object;
+	}
+
 	ConstructorHelpers::FClassFinder<UHKAnimInstance> AnimInstanceRef(TEXT("/Script/Engine.Blueprint'/Game/Main/Blueprints/Animation/BP_AnimInstance.BP_AnimInstance_C'"));
 	if (AnimInstanceRef.Succeeded())
 	{
@@ -127,6 +133,7 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	{
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 1);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 2);		
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 3);
 		EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::ChangeWeapon);
 	}
 
@@ -313,6 +320,8 @@ void AHKPlayerCharacter::OnRep_WeaponNum()
 	EquipWeapon = Cast<AHKWeapon>(SwapWeapons.Find(WeaponNum)->GetDefaultObject());
 	WeaponSocket_R->SetSkeletalMesh(&EquipWeapon->GetWeaponMesh());
 	SetShotMontage(&EquipWeapon->GetShotMontage());
+	SetReloadMontage(&EquipWeapon->GetReloadMontage());
+	SetSwapMontage(&EquipWeapon->GetSwapMontage());
 }
 
 void AHKPlayerCharacter::UpdateChangeWeapon_Server_Implementation(const int32& InputKey)
@@ -320,6 +329,8 @@ void AHKPlayerCharacter::UpdateChangeWeapon_Server_Implementation(const int32& I
 	WeaponNum = InputKey;
 	EquipWeapon = Cast<AHKWeapon>(SwapWeapons.Find(WeaponNum)->GetDefaultObject());
 	SetShotMontage(&EquipWeapon->GetShotMontage());
+	SetReloadMontage(&EquipWeapon->GetReloadMontage());
+	SetSwapMontage(&EquipWeapon->GetSwapMontage());
 }
 
 void AHKPlayerCharacter::UpdateInputMoveValue_Server_Implementation(const FVector2D& OwnerInputMoveValue)

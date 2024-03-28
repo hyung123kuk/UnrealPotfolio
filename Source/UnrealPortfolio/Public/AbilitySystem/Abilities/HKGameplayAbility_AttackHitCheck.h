@@ -22,6 +22,8 @@ protected:
 
 	UFUNCTION()
 	void OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+	float ConfirmEffectLevelByBoneName(FString BoneNameString) const;
+	
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "AAGAS")

@@ -33,18 +33,19 @@ void UHKGameplayAbility_Dead::ActivateAbility(const FGameplayAbilitySpecHandle H
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	AHKCharacterBase* Characrter = CastChecked<AHKCharacterBase>(ActorInfo->AvatarActor.Get());
+	AHKCharacterBase* Character = CastChecked<AHKCharacterBase>(ActorInfo->AvatarActor.Get());
 
 	UHKAbilityTask_Dead* DeadTask = UHKAbilityTask_Dead::CreateTask(this);
 	DeadTask->ReadyForActivation();
 
 	FName SectionName = *FString::Printf(TEXT("Default"));
-	UAbilityTask_PlayMontageAndWait* DeadMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayDead"), Characrter->GetDeadMontage(), 1.0f, SectionName);
+	UAbilityTask_PlayMontageAndWait* DeadMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayDead"), Character->GetDeadMontage(), 1.0f, SectionName);
 	DeadMontageTask->ReadyForActivation();
-	if (Characrter)
+	if (Character)
 	{
-		Characrter->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		Characrter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Character->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	}
 
 }

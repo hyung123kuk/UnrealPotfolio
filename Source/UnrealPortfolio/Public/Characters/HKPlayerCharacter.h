@@ -96,6 +96,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ZoomAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ReloadAction;
+
 //Ability Params
 protected:
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
