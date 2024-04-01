@@ -24,7 +24,8 @@ public:
 	FORCEINLINE const FVector2D& GetMoveValue() const { return InputMoveValue; }
 	FORCEINLINE const FRotator& GetLookValue() const { return InputLookValue; }
 	AHKWeapon* GetWeapon() const { return EquipWeapon; }
-	
+	class UCameraComponent* GetCameraComponent() const { return CameraComponent; }
+	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -36,7 +37,7 @@ protected:
 //Ability Func
 protected:	
 	void InitAbilityActorInfo();
-	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 	void GASInputPressed(int32 InputId);
 	void GASInputReleased(int32 InputId);
 
@@ -128,6 +129,6 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponNum, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	int32 WeaponNum;
 
+
 	friend class AHKTargetActor_Shot;
-	friend class AHKTargetActor_MultipleShots;
 };

@@ -15,46 +15,31 @@
 
 AHKTargetActor_Shot::AHKTargetActor_Shot()
 {
+	bMadeLocal = true;
 }
 
 void AHKTargetActor_Shot::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
-	SourceActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
-}
-
-void AHKTargetActor_Shot::ConfirmTargetingAndContinue()
-{
-	if (SourceActor)
-	{
-		FGameplayAbilityTargetDataHandle DataHandle = MakeTargetData();
-		TargetDataReadyDelegate.Broadcast(DataHandle);
-	}
+	ConfirmTargeting();
 }
 
 FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 {
-	AHKPlayerCharacter* Character = CastChecked<AHKPlayerCharacter>(SourceActor);							
 
-	FGameplayAbilityTargetDataHandle DataHandle;
-	FVector MuzzleLocation;
-
-	const UCameraComponent* CameraComponent = Character->CameraComponent;
-	const AHKWeapon* Weapon = Character->GetWeapon();
-
-	const FVector CameraStartLocation = CameraComponent->GetComponentLocation();
-
+	FVector ShotStartLocation;
 	//스나이퍼 줌일때 공격 시작점은 카메라 시작점으로
-	if (Character->GetAbilitySystemComponent()->HasMatchingGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM))
+	if (PlayerCharacter->GetAbilitySystemComponent()->HasMatchingGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM))
 	{
-		MuzzleLocation = CameraStartLocation;
-		Character->Zoom(0);
+		ShotStartLocation = CameraLocation;
+		PlayerCharacter->Zoom(0);
 	}
 	else
 	{
-		MuzzleLocation = Character->GetMesh()->GetSocketLocation("MuzzleFlash");
+		ShotStartLocation = MuzzleLocation;
 	}
 
+	FGameplayAbilityTargetDataHandle DataHandle;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(SourceActor);
 	QueryParams.bTraceComplex = true;
@@ -63,8 +48,8 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 	{
 		FHitResult HitResult;
 		const FVector RandPos = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(CameraComponent->GetForwardVector(), Weapon->GetBulletSpreadAngle());
-		const FVector BulletEndLocation = Character->GetPawnViewLocation() + (CameraComponent->GetForwardVector() + RandPos) * Weapon->GetMaxDamageRange();
-		const bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLocation, BulletEndLocation, CHANNEL_ATTACK, QueryParams);
+		const FVector BulletEndLocation = PlayerCharacter->GetPawnViewLocation() + (CameraComponent->GetForwardVector() + RandPos) * Weapon->GetDamageRange();
+		const bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, ShotStartLocation, BulletEndLocation, CHANNEL_ATTACK, QueryParams);
 
 		if (HitDetected)
 		{
@@ -72,7 +57,7 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 			DataHandle.Add(TargetData);
 		}
 
-		#pragma region Debug
+#pragma region ENABLE_DRAW_DEBUG
 
 		DrawDebugLine(GetWorld(), MuzzleLocation, BulletEndLocation, FColor(255, 255, 255, 64), false, 0.1f, 0U, 0.5f);
 		if (HitDetected == true)
@@ -80,7 +65,7 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 			UE_LOG(LogTemp, Log, TEXT("%s"), *HitResult.BoneName.ToString());
 			DrawDebugSphere(GetWorld(), HitResult.Location, 3.f, 16, FColor(255, 0, 0, 255), true, 20.f, 0U, 5.f);
 		}
-		#pragma endregion
+#pragma endregion
 
 	}
 

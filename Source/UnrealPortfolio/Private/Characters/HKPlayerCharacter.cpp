@@ -101,6 +101,7 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 	WeaponSocket_R = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_R"));
 	WeaponSocket_R->SetupAttachment(GetMesh(), TEXT("WeaponSocket_R"));
 	WeaponNum = 0;
+
 }
 
 void AHKPlayerCharacter::BeginPlay()
@@ -172,7 +173,7 @@ void AHKPlayerCharacter::PossessedBy(AController* NewController)
 	{
 		auto Swap = SwapWeapon.Value;
 		
-		FGameplayAbilitySpec StartSpec(Cast<AHKWeapon>(Swap->GetDefaultObject())->SwapAbility);
+		FGameplayAbilitySpec StartSpec(Cast<AHKWeapon>(Swap->GetDefaultObject())->GetSwapAbility());
 		ASC->GiveAbility(StartSpec);
 	}
 }
@@ -188,6 +189,7 @@ void AHKPlayerCharacter::OnRep_PlayerState()
 	{
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
+
 }
 
 void AHKPlayerCharacter::InitAbilityActorInfo()
@@ -295,10 +297,10 @@ void AHKPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
 
 	AHKWeapon* NewWeapon = Cast<AHKWeapon>(SwapWeapons.Find(InputKey)->GetDefaultObject());
 
-	if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Character.State.IsShot"))))
+	if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Character.State.IsAttack"))))
 		return;
 
-	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(NewWeapon->SwapAbility);
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(NewWeapon->GetSwapAbility());
 	UpdateChangeWeapon_Server(InputKey);
 
 	if (Spec)

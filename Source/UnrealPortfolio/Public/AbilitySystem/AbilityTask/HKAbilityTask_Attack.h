@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/Tasks/AbilityTask.h"
-#include "HKAbilityTask_Shot.generated.h"
+#include "HKAbilityTask_Attack.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FShotResultDelegate, const FGameplayAbilityTargetDataHandle&, TargetDataHandle);
 
@@ -13,15 +13,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FShotResultDelegate, const FGameplay
  * 
  */
 UCLASS()
-class UNREALPORTFOLIO_API UHKAbilityTask_Shot : public UAbilityTask
+class UNREALPORTFOLIO_API UHKAbilityTask_Attack : public UAbilityTask
 {
 	GENERATED_BODY()
 	
 public:
-	UHKAbilityTask_Shot();
+	UHKAbilityTask_Attack();
 
 	UFUNCTION(BlueprintCallable, Category = "AATask", meta = (DisplayName = "ShotTask", HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UHKAbilityTask_Shot* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class AHKTargetActor_Shot> TargetActorClass);
+	static UHKAbilityTask_Attack* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class AHKTargetActorBase> TargetActorClass);
 	
 	virtual void Activate() override;
 	virtual void OnDestroy(bool AbilityEnded) override;
@@ -35,8 +35,17 @@ public:
 
 protected:
 	UPROPERTY()
-	TSubclassOf<class AHKTargetActor_Shot> TargetActorClass;
+	TSubclassOf<class AHKTargetActorBase> TargetActorClass;
 
 	UPROPERTY()
-	TObjectPtr<class AHKTargetActor_Shot> SpawnedTargetActor;
+	TObjectPtr<class AHKTargetActorBase> SpawnedTargetActor;
+
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
+	TObjectPtr<class AHKPlayerCharacter> PlayerCharacter;
+
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
+	FVector MuzzleLocation;
+
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
+	FRotator MuzzleRotation;
 };

@@ -43,7 +43,7 @@ void UHKAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningActor());
 			if (ASC)
 			{
-				bIsAttack = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Character.State.IsShot")));
+				bIsAttack = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Character.State.IsAttack")));
 			}
 			AHKWeapon* Weapon = PlayerCharacter->GetWeapon();
 			if (Weapon)

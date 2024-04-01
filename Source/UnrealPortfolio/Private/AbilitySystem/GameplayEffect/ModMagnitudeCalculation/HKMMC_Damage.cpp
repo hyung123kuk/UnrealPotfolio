@@ -18,7 +18,7 @@ float UHKMMC_Damage::CalculateBaseMagnitude_Implementation(const FGameplayEffect
 	EvaluationParameters.SourceTags = SourceTags;
 	EvaluationParameters.TargetTags = TargetTags;
 
-	AHKPlayerCharacter* Character = Cast<AHKPlayerCharacter>(Spec.GetContext().GetInstigator());
+	AHKPlayerCharacter* Character = Cast<AHKPlayerCharacter>(Spec.GetContext().GetEffectCauser());
 	
 	float Damage = Character->GetWeapon()->GetDamage();
 

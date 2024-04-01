@@ -28,5 +28,4 @@ protected:
 	UFUNCTION()
 	void OnInterruptedCallback();
 
-	friend class AHKPlayerCharacter;
 };

@@ -9,6 +9,8 @@ AHKWeapon::AHKWeapon()
 {
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
 	WeaponMesh->SetupAttachment(GetRootComponent());
+	LoadedBullets = MaximumLoadedBullets;
+	RemainBullets = MaximumLoadedBullets * 3;
 }
 
 bool AHKWeapon::LoadedBullet()

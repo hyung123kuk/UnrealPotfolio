@@ -23,13 +23,12 @@ protected:
 	UFUNCTION()
 	void OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
 	float ConfirmEffectLevelByBoneName(FString BoneNameString) const;
-	
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TSubclassOf<class UGameplayEffect> AttackDamageEffect;
 
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
-	TSubclassOf<class AHKTargetActor_Shot> TargetActorClass;
+	TSubclassOf<class AHKTargetActorBase> TargetActorClass;
 
 };

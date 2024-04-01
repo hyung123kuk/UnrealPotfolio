@@ -4,22 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbilityTargetActor.h"
+#include "HKTargetActorBase.h"
 #include "HKTargetActor_Shot.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UNREALPORTFOLIO_API AHKTargetActor_Shot : public AGameplayAbilityTargetActor
+class UNREALPORTFOLIO_API AHKTargetActor_Shot : public AHKTargetActorBase
 {
 	GENERATED_BODY()
 	
 public:
 	AHKTargetActor_Shot();
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
-	virtual void ConfirmTargetingAndContinue() override;
 
 protected:
-	virtual FGameplayAbilityTargetDataHandle MakeTargetData() const;
+	virtual FGameplayAbilityTargetDataHandle MakeTargetData() const override;
 
 };

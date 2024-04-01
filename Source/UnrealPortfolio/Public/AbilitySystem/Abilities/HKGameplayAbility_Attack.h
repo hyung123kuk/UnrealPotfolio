@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "HKGameplayAbility_Shot.generated.h"
+#include "HKGameplayAbility_Attack.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UNREALPORTFOLIO_API UHKGameplayAbility_Shot : public UGameplayAbility
+class UNREALPORTFOLIO_API UHKGameplayAbility_Attack : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
 public:
-	UHKGameplayAbility_Shot();
+	UHKGameplayAbility_Attack();
 	
 protected:
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;

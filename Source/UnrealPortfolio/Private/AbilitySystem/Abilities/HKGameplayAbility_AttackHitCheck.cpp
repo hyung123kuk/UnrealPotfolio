@@ -2,7 +2,7 @@
 
 
 #include "AbilitySystem/Abilities/HKGameplayAbility_AttackHitCheck.h"
-#include "AbilitySystem/AbilityTask/HKAbilityTask_Shot.h"
+#include "AbilitySystem/AbilityTask/HKAbilityTask_Attack.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "UnrealPortfolio/UnrealPortfolio.h"
 #include "AbilitySystemComponent.h"
@@ -21,7 +21,7 @@ void UHKGameplayAbility_AttackHitCheck::ActivateAbility(const FGameplayAbilitySp
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
 	AHKPlayerCharacter* PlayerCharacter = Cast<AHKPlayerCharacter>(ActorInfo->AvatarActor.Get());
-	UHKAbilityTask_Shot* AttackTraceTask = UHKAbilityTask_Shot::CreateTask(this, PlayerCharacter->GetWeapon()->GetTargetActor());
+	UHKAbilityTask_Attack* AttackTraceTask = UHKAbilityTask_Attack::CreateTask(this, PlayerCharacter->GetWeapon()->GetTargetActor());
 	AttackTraceTask->OnComplete.AddDynamic(this, &UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback);
 	AttackTraceTask->ReadyForActivation();
 }
@@ -55,6 +55,24 @@ void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbi
 				CueParam.EffectContext = CueContextHandle;
 				TargetASC->ExecuteGameplayCue(HKTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
 			}
+		}
+
+	}
+	else if (UAbilitySystemBlueprintLibrary::TargetDataHasActor(TargetDataHandle, 0))
+	{
+		UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
+
+		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackDamageEffect);
+		if (EffectSpecHandle.IsValid())
+		{
+			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+
+			FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
+			CueContextHandle.AddActors(TargetDataHandle.Data[0].Get()->GetActors(), false);
+			FGameplayCueParameters CueParam;
+			CueParam.EffectContext = CueContextHandle;
+
+			SourceASC->ExecuteGameplayCue(HKTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
 		}
 
 	}

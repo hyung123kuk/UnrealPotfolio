@@ -36,18 +36,18 @@ public:
 	UAnimMontage& GetShotMontage() const { return *ShotMontage; }
 	UAnimMontage& GetReloadMontage() const { return *ReloadMontage; }
 	UAnimMontage& GetSwapMontage() const { return *SwapMontage; }
-	TSubclassOf<class AHKTargetActor_Shot> GetTargetActor() const { return TargetActor; }
+	TSubclassOf<class AHKTargetActorBase> GetTargetActor() const { return TargetActor; }
+	TSubclassOf<class UHKGameplayAbility_WeaponSwap> GetSwapAbility() const { return SwapAbility; }
 
 	const FORCEINLINE EWeaponType& GetWeaponType() const { return WeaponType; }
 	const FORCEINLINE float GetDamage() const { return Damage; }
 	const FORCEINLINE float GetRecoil() const { return Recoil; }
 	const FORCEINLINE float GetBulletSpreadAngle() const { return BulletSpreadAngle; }
-	const FORCEINLINE float GetMaxDamageRange() const { return MaxDamageRange; }
+	const FORCEINLINE float GetDamageRange() const { return DamageRange; }
 	const FORCEINLINE int32 GetBulletsPerCartridge() const { return BulletsPerCartridge; }
 	const FORCEINLINE int32 GetLoadedBullets() const { return LoadedBullets; }
 	const FORCEINLINE int32 GetMaximumLoadedBullets() const { return MaximumLoadedBullets; }
 	const FORCEINLINE int32 GetRemainBullets() const { return RemainBullets; }
-
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
@@ -60,7 +60,7 @@ protected:
 	float BulletSpreadAngle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
-	float MaxDamageRange;
+	float DamageRange;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
 	int32 BulletsPerCartridge;
@@ -93,7 +93,6 @@ protected:
 	EWeaponType WeaponType = EWeaponType::MeleeWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
-	TSubclassOf<class AHKTargetActor_Shot> TargetActor;
+	TSubclassOf<class AHKTargetActorBase> TargetActor;
 
-	friend class AHKPlayerCharacter;
 };
