@@ -48,9 +48,9 @@ void AHKTargetActor_Projectile::OnHit(UPrimitiveComponent* HitComponent, AActor*
 
 FGameplayAbilityTargetDataHandle AHKTargetActor_Projectile::MakeTargetData() const
 {
-
 	TArray<FOverlapResult> Overlaps;
-	const float DamageRange = CastChecked<AHKPlayerCharacter>(SourceActor)->GetWeapon()->GetDamageRange();
+	AHKPlayerCharacter* ShooterCharacter = CastChecked<AHKPlayerCharacter>(SourceActor);
+	const float DamageRange = ShooterCharacter->GetWeapon()->GetDamageRange();
 
 	FVector Origin = GetActorLocation();
 	FCollisionQueryParams QueryParams;
@@ -76,6 +76,10 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Projectile::MakeTargetData() con
 	FColor DrawColor = HitActors.Num() > 0 ? FColor::Green : FColor::Red;
 	DrawDebugSphere(GetWorld(), Origin, DamageRange, 16, DrawColor, false, 3.0f);
 #endif
+
+	FGameplayCueParameters CueParam;
+	CueParam.Location = Origin;
+	ShooterCharacter->GetAbilitySystemComponent()->ExecuteGameplayCue(HKTAG_GAMEPLAYCUE_CHARACTER_LAUNCHEREXPLOSION, CueParam);
 
 	return FGameplayAbilityTargetDataHandle(ActorsData);
 }

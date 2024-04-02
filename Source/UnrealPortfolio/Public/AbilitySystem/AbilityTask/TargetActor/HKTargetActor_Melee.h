@@ -14,4 +14,13 @@ class UNREALPORTFOLIO_API AHKTargetActor_Melee : public AHKTargetActorBase
 {
 	GENERATED_BODY()
 	
+public:
+	AHKTargetActor_Melee();
+	virtual void StartTargeting(UGameplayAbility* Ability) override;
+
+protected:
+	virtual FGameplayAbilityTargetDataHandle MakeTargetData() const override;
+
+	float AttackRadius = 50.f;
+
 };

@@ -15,6 +15,9 @@ AHKWeapon::AHKWeapon()
 
 bool AHKWeapon::LoadedBullet()
 {
+	if (WeaponType == EWeaponType::MeleeWeapon)
+		return true;
+
 	if (LoadedBullets <= 0)
 		return false;
 
@@ -48,6 +51,9 @@ void AHKWeapon::Reload()
 
 bool AHKWeapon::CanReload()
 {
+	if (WeaponType == EWeaponType::MeleeWeapon)
+		return false;
+
 	if (RemainBullets == 0)
 		return false;
 

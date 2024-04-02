@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "GameplayCueNotify_Static.h"
 #include "Sound/SoundCue.h"
-#include "HKGameplayCue_AttackHit.generated.h"
+#include "HKGameplayCue_SoundEffect.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UNREALPORTFOLIO_API UHKGameplayCue_AttackHit : public UGameplayCueNotify_Static
+class UNREALPORTFOLIO_API UHKGameplayCue_SoundEffect : public UGameplayCueNotify_Static
 {
 	GENERATED_BODY()
 	
 public:
-	UHKGameplayCue_AttackHit();
+	UHKGameplayCue_SoundEffect();
 
 	virtual bool OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters) const override;
 

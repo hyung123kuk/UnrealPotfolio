@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AbilitySystem/AbilityTask/GameplayCue/HKGameplayCue_AttackHit.h"
+#include "AbilitySystem/AbilityTask/GameplayCue/HKGameplayCue_SoundEffect.h"
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"
 
-UHKGameplayCue_AttackHit::UHKGameplayCue_AttackHit()
+UHKGameplayCue_SoundEffect::UHKGameplayCue_SoundEffect()
 {
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionRef(TEXT("/Script/Engine.ParticleSystem'/Game/Main/Effect/P_TwinBlast_Primary_HitCharacter.P_TwinBlast_Primary_HitCharacter'"));
 	if (ExplosionRef.Object)
@@ -18,19 +18,19 @@ UHKGameplayCue_AttackHit::UHKGameplayCue_AttackHit()
 	{
 		HitSound = HitSoundRef.Object;
 	}
-
 }
 
-bool UHKGameplayCue_AttackHit::OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters) const
+bool UHKGameplayCue_SoundEffect::OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters) const
 {
-	const FHitResult* HitResult = Parameters.EffectContext.GetHitResult();
-	if (HitResult)
+	if (ParticleSystem)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(Target, ParticleSystem, HitResult->ImpactPoint, FRotator::ZeroRotator, true);
-		UGameplayStatics::PlaySound2D(this, HitSound);
-
-		return true;
+		UGameplayStatics::SpawnEmitterAtLocation(Target, ParticleSystem, Parameters.Location, FRotator::ZeroRotator, true);
 	}
 
-	return false;
+	if (HitSound)
+	{
+		UGameplayStatics::PlaySound2D(this, HitSound);
+	}
+
+	return true;
 }

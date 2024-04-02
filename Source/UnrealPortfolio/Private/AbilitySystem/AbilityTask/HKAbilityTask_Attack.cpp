@@ -9,6 +9,8 @@
 #include "Camera/CameraComponent.h"
 #include "AbilitySystem/AbilityTask/TargetActor/HKTargetActor_Projectile.h"
 #include "Net/UnrealNetwork.h"
+#include "UnrealPortfolio/UnrealPortfolio.h"
+#include "AbilitySystemComponent.h"
 
 UHKAbilityTask_Attack::UHKAbilityTask_Attack()
 {
@@ -32,6 +34,10 @@ void UHKAbilityTask_Attack::Activate()
 
 	SpawnedTargetActor = Cast<AHKTargetActorBase>(Ability->GetWorld()->SpawnActorDeferred<AGameplayAbilityTargetActor>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	
+	FGameplayCueParameters CueParam;
+	CueParam.Location = MuzzleLocation;
+	AbilitySystemComponent->ExecuteGameplayCue(HKTAG_GAMEPLAYCUE_CHARACTER_MUZZLEFLASH, CueParam);
+
 	if (!PlayerCharacter->HasAuthority() && !SpawnedTargetActor->GetMadeLocal())
 	{
 		return;
@@ -57,6 +63,8 @@ void UHKAbilityTask_Attack::Activate()
 	}
 
 	SetWaitingOnAvatar();
+
+
 }
 
 void UHKAbilityTask_Attack::OnDestroy(bool AbilityEnded)

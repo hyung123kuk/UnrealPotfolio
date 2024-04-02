@@ -52,6 +52,7 @@ void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbi
 				FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
 				CueContextHandle.AddHitResult(HitResult);
 				FGameplayCueParameters CueParam;
+				CueParam.Location = HitResult.ImpactPoint;
 				CueParam.EffectContext = CueContextHandle;
 				TargetASC->ExecuteGameplayCue(HKTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
 			}
@@ -66,16 +67,11 @@ void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbi
 		if (EffectSpecHandle.IsValid())
 		{
 			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
-
-			FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
-			CueContextHandle.AddActors(TargetDataHandle.Data[0].Get()->GetActors(), false);
-			FGameplayCueParameters CueParam;
-			CueParam.EffectContext = CueContextHandle;
-
-			SourceASC->ExecuteGameplayCue(HKTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
 		}
 
 	}
+
+
 
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;

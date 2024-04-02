@@ -25,5 +25,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogABTeleport, Log, All);
 
 // TAG
 #define HKTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT FGameplayTag::RequestGameplayTag(FName("GameplayCue.Character.AttackHit"))
+#define HKTAG_GAMEPLAYCUE_CHARACTER_MUZZLEFLASH FGameplayTag::RequestGameplayTag(FName("GameplayCue.Character.MuzzleFlash"))
+#define HKTAG_GAMEPLAYCUE_CHARACTER_LAUNCHEREXPLOSION FGameplayTag::RequestGameplayTag(FName("GameplayCue.Character.LauncherExplosion"))
 #define HKTAG_GAMEPLAYCUE_CHARACTER_DEAD FGameplayTag::RequestGameplayTag(FName("GameplayCue.Character.Dead"))
 #define HKTAG_CHARACTER_STATE_ISZOOM FGameplayTag::RequestGameplayTag(FName("Character.State.IsZoom"))
