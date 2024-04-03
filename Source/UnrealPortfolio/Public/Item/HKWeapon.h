@@ -48,6 +48,11 @@ public:
 	const FORCEINLINE int32 GetLoadedBullets() const { return LoadedBullets; }
 	const FORCEINLINE int32 GetMaximumLoadedBullets() const { return MaximumLoadedBullets; }
 	const FORCEINLINE int32 GetRemainBullets() const { return RemainBullets; }
+	const FORCEINLINE float GetBeforeZoomFieldOfView() const { return BeforeZoomFieldOfView; }
+	const FORCEINLINE float GetAfterZoomFieldOfView() const { return AfterZoomFieldOfView; }
+	const FORCEINLINE float GetBeforeZoomTargetArmLength() const { return BeforeZoomTargetArmLength; }
+	const FORCEINLINE float GetAfterZoomTargetArmLength() const { return AfterZoomTargetArmLength; }
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
@@ -73,6 +78,18 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
 	int32 RemainBullets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	float BeforeZoomFieldOfView;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	float AfterZoomFieldOfView;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	float BeforeZoomTargetArmLength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	float AfterZoomTargetArmLength;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
 	TObjectPtr<class UAnimMontage> ShotMontage;

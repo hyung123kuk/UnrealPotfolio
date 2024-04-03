@@ -9,6 +9,10 @@
 #include "HKPlayerCharacter.generated.h"
 
 class AHKWeapon;
+class UCameraComponent;
+class UAbilitySystemComponent;
+class AHKWeapon;
+class USpringArmComponent;
 
 /**
  * 
@@ -23,9 +27,17 @@ public:
 
 	FORCEINLINE const FVector2D& GetMoveValue() const { return InputMoveValue; }
 	FORCEINLINE const FRotator& GetLookValue() const { return InputLookValue; }
+
+	FORCEINLINE const bool GetIsZoom() const { return IsZoom; }
+	FORCEINLINE void SetIsZoom(bool NewIsZoom) { IsZoom = NewIsZoom; }
+
+	TMap<int32, TSubclassOf<AHKWeapon>> GetSwapWeapons() { return SwapWeapons; }
 	AHKWeapon* GetWeapon() const { return EquipWeapon; }
-	class UCameraComponent* GetCameraComponent() const { return CameraComponent; }
-	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	void SetWeapon(AHKWeapon* EquipWeapon);
+
+	UCameraComponent* GetCameraComponent() const { return CameraComponent; }
+	USpringArmComponent* GetSpringArmComponent() const { return SpringArmComponent; }
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -45,37 +57,32 @@ protected:
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void Zoom(const FInputActionValue& Value);
+	void ChangeWeapon(const FInputActionValue& Value);
 
 	UFUNCTION()
-	void ChangeWeapon(const FInputActionValue& Value);
+	void OnRep_ChangeWeapon();
 
 	UFUNCTION(Server, Unreliable)
 	void UpdateInputMoveValue_Server(const FVector2D& OwnerInputMoveValue);
 	UFUNCTION(Server, Unreliable)
 	void UpdateInputLookValue_Server(const FRotator& OwnerInputLookValue);
 
-	
-	UFUNCTION(Server, Reliable)
-	void UpdateChangeWeapon_Server(const int32& InputKey);
-	UFUNCTION()
-	void OnRep_WeaponNum();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AACamera", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USpringArmComponent> SpringArmComponent;
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AACamera", Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UCameraComponent> CameraComponent;
+	TObjectPtr<UCameraComponent> CameraComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "AAWeapon", Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWeapon", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USkeletalMeshComponent> WeaponSocket_R;
 
-	UPROPERTY(EditAnywhere, Category = "AAWeapon")
-	TObjectPtr<class AHKWeapon> EquipWeapon;
+	UPROPERTY(ReplicatedUsing = OnRep_ChangeWeapon, EditAnywhere, Category = "AAWeapon")
+	TObjectPtr<AHKWeapon> EquipWeapon;
 
 //Input Action
 protected:
@@ -103,7 +110,7 @@ protected:
 //Ability Params
 protected:
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
-	TObjectPtr<class UAbilitySystemComponent> ASC;
+	TObjectPtr<UAbilitySystemComponent> ASC;
 
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TObjectPtr<class UHKCharacterAttributeSet> CharacterAttributeSet;
@@ -115,7 +122,7 @@ protected:
 	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
 
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
-	TMap<int32, TSubclassOf<class AHKWeapon>> SwapWeapons;
+	TMap<int32, TSubclassOf<AHKWeapon>> SwapWeapons;
 
 
 //Behaviour Params
@@ -126,9 +133,7 @@ private:
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
 	FRotator InputLookValue;
 
-	UPROPERTY(ReplicatedUsing = OnRep_WeaponNum, VisibleAnywhere, BlueprintReadOnly, Category = "AAInput", Meta = (AllowPrivateAccess = "true"))
-	int32 WeaponNum;
-
+	bool IsZoom;
 
 	friend class AHKTargetActor_Shot;
 };

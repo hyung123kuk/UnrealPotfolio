@@ -12,7 +12,6 @@ UHKGameplayCue_Dead::UHKGameplayCue_Dead()
 
 bool UHKGameplayCue_Dead::OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters) const
 {
-	// TODO : Dead Effect
 	ACharacter* Character = Cast<ACharacter>(Target);
 	if (Character)
 	{

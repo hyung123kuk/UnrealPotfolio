@@ -32,7 +32,6 @@ FGameplayAbilityTargetDataHandle AHKTargetActor_Shot::MakeTargetData() const
 	if (PlayerCharacter->GetAbilitySystemComponent()->HasMatchingGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM))
 	{
 		ShotStartLocation = CameraLocation;
-		PlayerCharacter->Zoom(0);
 	}
 	else
 	{

@@ -14,8 +14,25 @@ UHKGameplayAbility_WeaponSwap::UHKGameplayAbility_WeaponSwap()
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 }
 
+bool UHKGameplayAbility_WeaponSwap::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (!Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
+	{
+		return false;
+	}
+
+	AHKPlayerCharacter* PlayerCharacter = Cast<AHKPlayerCharacter>(ActorInfo->AvatarActor.Get());
+	if (PlayerCharacter->GetWeapon() == SwapWeapon.GetDefaultObject())
+	{
+		return false;
+	}
+	return true;
+}
+
 void UHKGameplayAbility_WeaponSwap::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
 	AHKPlayerCharacter* PlayerCharacter = Cast<AHKPlayerCharacter>(ActorInfo->AvatarActor.Get());
 
 	FName SectionName = *FString::Printf(TEXT("Default"));
@@ -24,6 +41,9 @@ void UHKGameplayAbility_WeaponSwap::ActivateAbility(const FGameplayAbilitySpecHa
 	SwapMontageTask->OnCompleted.AddDynamic(this, &UHKGameplayAbility_WeaponSwap::OnCompleteCallback);
 	SwapMontageTask->OnInterrupted.AddDynamic(this, &UHKGameplayAbility_WeaponSwap::OnInterruptedCallback);
 	SwapMontageTask->ReadyForActivation();
+
+	PlayerCharacter->SetWeapon(SwapWeapon.GetDefaultObject());
+
 }
 
 void UHKGameplayAbility_WeaponSwap::OnCompleteCallback()

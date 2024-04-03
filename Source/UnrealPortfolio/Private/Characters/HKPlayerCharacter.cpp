@@ -21,7 +21,6 @@
 AHKPlayerCharacter::AHKPlayerCharacter()
 {
 	bReplicates = true;
-
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
@@ -44,6 +43,11 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+
+	IsZoom = false;
+
+	WeaponSocket_R = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_R"));
+	WeaponSocket_R->SetupAttachment(GetMesh(), TEXT("WeaponSocket_R"));
 
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Main/Input/IMC_Gun.IMC_Gun'"));
 	if (InputMappingContextRef.Succeeded())
@@ -98,9 +102,7 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceRef.Class);
 	}
-	WeaponSocket_R = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_R"));
-	WeaponSocket_R->SetupAttachment(GetMesh(), TEXT("WeaponSocket_R"));
-	WeaponNum = 0;
+
 
 }
 
@@ -128,13 +130,12 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
-	EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Started, this, &ThisClass::Zoom);
-
 	if (IsValid(ASC))
 	{
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 1);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 2);		
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 3);
+		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Started, this, &AHKPlayerCharacter::GASInputPressed, 4);
 		EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::ChangeWeapon);
 	}
 
@@ -147,7 +148,7 @@ void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 	DOREPLIFETIME(ThisClass, InputMoveValue);
 	DOREPLIFETIME(ThisClass, InputLookValue);
-	DOREPLIFETIME(ThisClass, WeaponNum);
+	DOREPLIFETIME(ThisClass, EquipWeapon);
 }
 
 void AHKPlayerCharacter::PossessedBy(AController* NewController)
@@ -211,29 +212,7 @@ void AHKPlayerCharacter::GASInputPressed(int32 InputId)
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
-		Spec->InputPressed = true;
-		if (Spec->IsActive())
-		{
-			ASC->AbilitySpecInputPressed(*Spec);
-		}
-		else
-		{
-			ASC->TryActivateAbility(Spec->Handle);
-		}
-	}
-}
-
-void AHKPlayerCharacter::GASInputReleased(int32 InputId)
-{
-	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
-	if (Spec)
-	{
-		Spec->InputPressed = false;
-		if (Spec->IsActive())
-		{
-			ASC->AbilitySpecInputReleased(*Spec);
-		}
-
+		ASC->TryActivateAbility(Spec->Handle);
 	}
 }
 
@@ -264,75 +243,31 @@ void AHKPlayerCharacter::Look(const FInputActionValue& Value)
 	UpdateInputLookValue_Server(InputLookValue);
 }
 
-void AHKPlayerCharacter::Zoom(const FInputActionValue& Value)
+void AHKPlayerCharacter::SetWeapon(AHKWeapon* NewEquipWeapon)
 {
-
-	if (!(EquipWeapon->GetWeaponType() == EWeaponType::Sniper))
-		return;
-
-	if (ASC->HasMatchingGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM))
-	{
-		SpringArmComponent->TargetArmLength = 400.0f;
-		CameraComponent->FieldOfView = 90.f;
-		ASC->RemoveLooseGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM);
-	}
-	else
-	{
-		SpringArmComponent->TargetArmLength = 0.f;
-		CameraComponent->FieldOfView = 40.f;
-		ASC->AddLooseGameplayTag(HKTAG_CHARACTER_STATE_ISZOOM);
-	}
-	
+	EquipWeapon = NewEquipWeapon;
+	WeaponSocket_R->SetSkeletalMesh(&NewEquipWeapon->GetWeaponMesh());
+	SetShotMontage(&NewEquipWeapon->GetShotMontage());
+	SetReloadMontage(&NewEquipWeapon->GetReloadMontage());
+	SetSwapMontage(&NewEquipWeapon->GetSwapMontage());
 }
 
 void AHKPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
 {
 	int32 InputKey = static_cast<int32>(Value.Get<float>());
 
-	if (WeaponNum == InputKey)
-		return;
-
-	if (!ASC)
-		return;
-
 	AHKWeapon* NewWeapon = Cast<AHKWeapon>(SwapWeapons.Find(InputKey)->GetDefaultObject());
-
-	if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Character.State.IsAttack"))))
-		return;
-
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(NewWeapon->GetSwapAbility());
-	UpdateChangeWeapon_Server(InputKey);
 
 	if (Spec)
 	{
-		if (Spec->IsActive())
-		{
-			ASC->AbilitySpecInputPressed(*Spec);
-		}
-		else
-		{
-			ASC->TryActivateAbility(Spec->Handle);
-		}
-
+		ASC->TryActivateAbility(Spec->Handle);
 	}
 }
 
-void AHKPlayerCharacter::OnRep_WeaponNum()
+void AHKPlayerCharacter::OnRep_ChangeWeapon()
 {
-	EquipWeapon = Cast<AHKWeapon>(SwapWeapons.Find(WeaponNum)->GetDefaultObject());
-	WeaponSocket_R->SetSkeletalMesh(&EquipWeapon->GetWeaponMesh());
-	SetShotMontage(&EquipWeapon->GetShotMontage());
-	SetReloadMontage(&EquipWeapon->GetReloadMontage());
-	SetSwapMontage(&EquipWeapon->GetSwapMontage());
-}
-
-void AHKPlayerCharacter::UpdateChangeWeapon_Server_Implementation(const int32& InputKey)
-{
-	WeaponNum = InputKey;
-	EquipWeapon = Cast<AHKWeapon>(SwapWeapons.Find(WeaponNum)->GetDefaultObject());
-	SetShotMontage(&EquipWeapon->GetShotMontage());
-	SetReloadMontage(&EquipWeapon->GetReloadMontage());
-	SetSwapMontage(&EquipWeapon->GetSwapMontage());
+	SetWeapon(EquipWeapon);
 }
 
 void AHKPlayerCharacter::UpdateInputMoveValue_Server_Implementation(const FVector2D& OwnerInputMoveValue)
