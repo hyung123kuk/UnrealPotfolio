@@ -13,15 +13,14 @@ UHKCharacterAttributeSet::UHKCharacterAttributeSet()
 	InitHealth(GetMaxHealth());
 }
 
-bool UHKCharacterAttributeSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
+void UHKCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
+	Super::PreAttributeChange(Attribute, NewValue);
 
-	if (!Super::PreGameplayEffectExecute(Data))
+	if (Attribute == GetHealthAttribute())
 	{
-		return false;
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
 	}
-
-	return true;
 }
 
 void UHKCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -40,6 +39,12 @@ void UHKCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
 			FGameplayEventData PayloadData;
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningActor(), FGameplayTag::RequestGameplayTag(FName("Character.State.IsDead")), PayloadData);
 		}
+	}
+
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Health : %f"), GetHealth());
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
 	}
 }
 

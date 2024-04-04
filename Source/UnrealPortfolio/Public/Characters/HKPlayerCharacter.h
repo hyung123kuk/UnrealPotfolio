@@ -135,5 +135,6 @@ private:
 
 	bool IsZoom;
 
+
 	friend class AHKTargetActor_Shot;
 };

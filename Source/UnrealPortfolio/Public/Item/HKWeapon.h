@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "HKItem.h"
 #include "HKWeapon.generated.h"
 
 UENUM(BlueprintType)
@@ -21,7 +22,7 @@ enum class EWeaponType : uint8
 class USkeletalMesh;
 
 UCLASS()
-class UNREALPORTFOLIO_API AHKWeapon : public AActor
+class UNREALPORTFOLIO_API AHKWeapon : public AHKItem
 {
 	GENERATED_BODY()
 
@@ -30,6 +31,7 @@ public:
 	bool LoadedBullet();
 	void Reload();
 	bool CanReload();
+	void AddAmmo();
 
 	USkeletalMesh& GetWeaponMesh() const { return *WeaponMesh->GetSkeletalMeshAsset(); }
 	USkeletalMeshComponent* GetWeaponMeshComponent() const { return WeaponMesh; }

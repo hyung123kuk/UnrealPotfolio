@@ -71,8 +71,6 @@ void UHKGameplayAbility_AttackHitCheck::OnTraceResultCallback(const FGameplayAbi
 
 	}
 
-
-
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);

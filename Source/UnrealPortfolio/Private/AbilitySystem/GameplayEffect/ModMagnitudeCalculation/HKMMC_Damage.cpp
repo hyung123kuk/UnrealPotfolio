@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/GameplayEffect/ModMagnitudeCalculation/HKMMC_Damage.h"
 #include "Characters/HKPlayerCharacter.h"
+#include "AbilitySystemComponent.h"
 #include "Item/HKWeapon.h"
 
 UHKMMC_Damage::UHKMMC_Damage()
@@ -21,6 +22,11 @@ float UHKMMC_Damage::CalculateBaseMagnitude_Implementation(const FGameplayEffect
 	AHKPlayerCharacter* Character = Cast<AHKPlayerCharacter>(Spec.GetContext().GetEffectCauser());
 	
 	float Damage = Character->GetWeapon()->GetDamage();
+
+	if (Character->GetAbilitySystemComponent()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Character.Buff.DamageUp"))))
+	{
+		Damage *= 2;
+	}
 
 	return Damage;
 }
