@@ -45,4 +45,5 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "AAAttack", Meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData Damage;
 
+	bool isDead = false;
 };

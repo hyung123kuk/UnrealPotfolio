@@ -6,6 +6,8 @@
 #include "Characters/HKCharacterBase.h"
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystemInterface.h"
+#include "Engine/DataTable.h"
+#include "GameplayTagContainer.h"
 #include "HKPlayerCharacter.generated.h"
 
 class AHKWeapon;
@@ -51,13 +53,13 @@ protected:
 	void InitAbilityActorInfo();
 
 	void GASInputPressed(int32 InputId);
-	void GASInputReleased(int32 InputId);
 
 //Behaviour Func
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void ChangeWeapon(const FInputActionValue& Value);
+	int32 GetWeaponNumber(const FGameplayTag& Tag);
 
 	UFUNCTION()
 	void OnRep_ChangeWeapon();
@@ -67,6 +69,12 @@ private:
 	UFUNCTION(Server, Unreliable)
 	void UpdateInputLookValue_Server(const FRotator& OwnerInputLookValue);
 
+	UFUNCTION(Client, Reliable)
+	void AcquireWeapon(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AAWeapon Data")
+	TObjectPtr<UDataTable> WeaponsDataTable;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AACamera", Meta = (AllowPrivateAccess = "true"))
@@ -83,6 +91,9 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_ChangeWeapon, EditAnywhere, Category = "AAWeapon")
 	TObjectPtr<AHKWeapon> EquipWeapon;
+
+	UPROPERTY(EditAnywhere, Category = "AAWeapon")
+	TArray<int32> HaveWeapons;
 
 //Input Action
 protected:
@@ -134,7 +145,7 @@ private:
 	FRotator InputLookValue;
 
 	bool IsZoom;
-
+	int32 SlotMaxCount = 3;
 
 	friend class AHKTargetActor_Shot;
 };

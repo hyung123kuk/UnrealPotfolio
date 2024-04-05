@@ -120,6 +120,10 @@ void AHKPlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	//첫번째 무기 피스톨 기본
+	HaveWeapons.Init(-1, SlotMaxCount);
+	HaveWeapons[0] = GetWeaponNumber(FGameplayTag::RequestGameplayTag(FName("Character.Event.GetPistol")));
 }
 
 void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -177,6 +181,8 @@ void AHKPlayerCharacter::PossessedBy(AController* NewController)
 		FGameplayAbilitySpec StartSpec(Cast<AHKWeapon>(Swap->GetDefaultObject())->GetSwapAbility());
 		ASC->GiveAbility(StartSpec);
 	}
+
+	ASC->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &AHKPlayerCharacter::AcquireWeapon);
 }
 
 void AHKPlayerCharacter::OnRep_PlayerState()
@@ -256,7 +262,14 @@ void AHKPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
 {
 	int32 InputKey = static_cast<int32>(Value.Get<float>());
 
-	AHKWeapon* NewWeapon = Cast<AHKWeapon>(SwapWeapons.Find(InputKey)->GetDefaultObject());
+	if (InputKey > HaveWeapons.Num())
+		return;
+
+	int32 ChangeWeaponKey = HaveWeapons[InputKey - 1];
+	if (ChangeWeaponKey == -1)
+		return;
+
+	AHKWeapon* NewWeapon = Cast<AHKWeapon>(SwapWeapons.Find(ChangeWeaponKey)->GetDefaultObject());
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(NewWeapon->GetSwapAbility());
 
 	if (Spec)
@@ -268,6 +281,42 @@ void AHKPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
 void AHKPlayerCharacter::OnRep_ChangeWeapon()
 {
 	SetWeapon(EquipWeapon);
+}
+
+void AHKPlayerCharacter::AcquireWeapon_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
+{
+
+	FGameplayTagContainer TagContainer;
+	EffectSpec.GetAllAssetTags(TagContainer);
+
+	for (const FGameplayTag& Tag : TagContainer)
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Character.Event"))))
+		{
+			// 비어있는 소켓 찾음
+			int32 EmptySocketNum;
+			if (!HaveWeapons.Find(-1, EmptySocketNum))
+				return;
+
+			HaveWeapons[EmptySocketNum] = GetWeaponNumber(Tag);
+		}
+	}
+}
+
+int32 AHKPlayerCharacter::GetWeaponNumber(const FGameplayTag& Tag)
+{
+	FWeaponRow* Row = WeaponsDataTable->FindRow<FWeaponRow>(Tag.GetTagName(), TEXT(""));
+	if (Row)
+	{
+		for (auto& SwapWeapon : SwapWeapons)
+		{
+			if (Row->WeaponClass == SwapWeapon.Value)
+			{
+				return SwapWeapon.Key;
+			}
+		}
+	}
+	return -1;
 }
 
 void AHKPlayerCharacter::UpdateInputMoveValue_Server_Implementation(const FVector2D& OwnerInputMoveValue)

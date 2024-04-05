@@ -34,8 +34,9 @@ void UHKCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
 		UE_LOG(LogTemp, Log, TEXT("Health : %f"), GetHealth());
 		SetDamage(0.0f);
 
-		if (GetHealth() < KINDA_SMALL_NUMBER)
+		if (GetHealth() < KINDA_SMALL_NUMBER && !isDead)
 		{
+			isDead = true;
 			FGameplayEventData PayloadData;
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningActor(), FGameplayTag::RequestGameplayTag(FName("Character.State.IsDead")), PayloadData);
 		}

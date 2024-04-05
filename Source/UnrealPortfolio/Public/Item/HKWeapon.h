@@ -6,7 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "HKItem.h"
+#include "Engine/DataTable.h"
+#include "GameplayTagContainer.h"
 #include "HKWeapon.generated.h"
+
+class USkeletalMesh;
 
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
@@ -19,7 +23,19 @@ enum class EWeaponType : uint8
 	Launcher,
 };
 
-class USkeletalMesh;
+USTRUCT(BlueprintType)
+struct FWeaponRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag MessageTag = FGameplayTag();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<AHKWeapon> WeaponClass;
+};
+
+
 
 UCLASS()
 class UNREALPORTFOLIO_API AHKWeapon : public AHKItem
