@@ -17,6 +17,11 @@
 #include "Game/HKPlayerState.h"
 #include "Item/HKWeapon.h"
 #include "AbilitySystem/Abilities/HKGameplayAbility_WeaponSwap.h"
+#include "UI/HKWidgetComponent.h"
+#include "UI/HKUserWidget.h"
+#include "Controllers/HKPlayerControllerBase.h"
+#include "Kismet/GameplayStatics.h"
+
 
 AHKPlayerCharacter::AHKPlayerCharacter()
 {
@@ -102,7 +107,6 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceRef.Class);
 	}
-
 
 }
 
@@ -206,6 +210,14 @@ void AHKPlayerCharacter::InitAbilityActorInfo()
 	ASC = GASPS->GetAbilitySystemComponent();
 	ASC->InitAbilityActorInfo(GASPS, this);
 	CharacterAttributeSet = GASPS->GetAttributeSet();
+
+
+	if (!HasAuthority() && GetOwner() == UGameplayStatics::GetPlayerController(this, 0))
+	{
+		//ASC 초기화가 된 후에 HUD 사용 가능
+		AHKPlayerControllerBase* HKControllerBase = Cast<AHKPlayerControllerBase>(GetController());
+		HKControllerBase->ShowHUD();
+	}
 }
 
 UAbilitySystemComponent* AHKPlayerCharacter::GetAbilitySystemComponent() const

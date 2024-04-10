@@ -13,5 +13,6 @@ UCLASS()
 class UNREALPORTFOLIO_API UHKGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+
 	
 };

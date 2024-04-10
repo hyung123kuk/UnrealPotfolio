@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "HKPlayerControllerBase.generated.h"
 
+class UHKHUD;
+class UCameraShakeBase;
 /**
  * 
  */
@@ -19,9 +21,16 @@ protected:
 	
 public:
 	void CameraShake(float Strength);
+	void ShowHUD();
+	UHKHUD* GetHUDWidget() const { return HUDWidget; }
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AACamera", Meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class UCameraShakeBase> FireShake;
+	TSubclassOf<UCameraShakeBase> FireShake;
 
+	UPROPERTY();
+	TObjectPtr<UHKHUD> HUDWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ASPlayerController", Meta = (AllowPrivateAccess));
+	TSubclassOf<UHKHUD> HUDWidgetClass;
 };
