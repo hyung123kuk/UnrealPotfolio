@@ -8,6 +8,8 @@
 
 
 class UHKHpBarUserWidget;
+class UHKInventoryWidget;
+
 /**
  * 
  */
@@ -22,5 +24,8 @@ public:
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UHKHpBarUserWidget> HpBar;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UHKInventoryWidget> Inventory;
 
 };

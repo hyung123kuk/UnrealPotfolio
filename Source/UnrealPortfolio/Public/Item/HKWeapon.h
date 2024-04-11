@@ -11,6 +11,7 @@
 #include "HKWeapon.generated.h"
 
 class USkeletalMesh;
+class UTexture2D;
 
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
@@ -53,6 +54,7 @@ public:
 	UAnimMontage& GetShotMontage() const { return *ShotMontage; }
 	UAnimMontage& GetReloadMontage() const { return *ReloadMontage; }
 	UAnimMontage& GetSwapMontage() const { return *SwapMontage; }
+	UTexture2D& GetWeaponTexture() const { return *WeaponTexture; }
 	TSubclassOf<class AHKTargetActorBase> GetTargetActor() const { return TargetActor; }
 	TSubclassOf<class UHKGameplayAbility_WeaponSwap> GetSwapAbility() const { return SwapAbility; }
 
@@ -71,6 +73,9 @@ public:
 	const FORCEINLINE float GetAfterZoomTargetArmLength() const { return AfterZoomTargetArmLength; }
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
+	TObjectPtr<UTexture2D> WeaponTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AAWeapon")
 	float Damage;

@@ -13,8 +13,9 @@
 class AHKWeapon;
 class UCameraComponent;
 class UAbilitySystemComponent;
-class AHKWeapon;
 class USpringArmComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGettingWeaponDelegate, AHKWeapon*, Weapon);
 
 /**
  * 
@@ -40,6 +41,8 @@ public:
 	UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 	USpringArmComponent* GetSpringArmComponent() const { return SpringArmComponent; }
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	FGettingWeaponDelegate GetWeaponDelegate;
 
 protected:
 	virtual void BeginPlay() override;

@@ -310,7 +310,9 @@ void AHKPlayerCharacter::AcquireWeapon_Implementation(UAbilitySystemComponent* A
 			if (!HaveWeapons.Find(-1, EmptySocketNum))
 				return;
 
-			HaveWeapons[EmptySocketNum] = GetWeaponNumber(Tag);
+			int32 WeaponNumber = GetWeaponNumber(Tag);
+			HaveWeapons[EmptySocketNum] = WeaponNumber;
+			GetWeaponDelegate.Broadcast(SwapWeapons[WeaponNumber].GetDefaultObject());
 		}
 	}
 }

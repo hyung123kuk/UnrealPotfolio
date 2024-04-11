@@ -7,6 +7,9 @@
 #include "GameplayEffectTypes.h"
 #include "HKHpBarUserWidget.generated.h"
 
+class UProgressBar;
+class UTextBlock;
+
 /**
  * 
  */
@@ -27,10 +30,10 @@ protected:
 
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UProgressBar> PbHpBar;
+	TObjectPtr<UProgressBar> PbHpBar;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTextBlock> TxtHpStat;
+	TObjectPtr<UTextBlock> TxtHpStat;
 	float CurrentHealth = 0.0f;
 	float CurrentMaxHealth = 0.1f;
 
