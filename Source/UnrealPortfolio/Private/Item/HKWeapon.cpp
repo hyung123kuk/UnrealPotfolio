@@ -23,8 +23,7 @@ bool AHKWeapon::LoadedBullet()
 
 	LoadedBullets--;
 
-	UE_LOG(LogTemp, Log, TEXT("LoadedBullets : %d / RemainBullets %d"), LoadedBullets, RemainBullets);
-
+	ChangeBulletDelegate.Broadcast(LoadedBullets, RemainBullets);
 	return true;
 }
 
@@ -45,8 +44,8 @@ void AHKWeapon::Reload()
 
 	RemainBullets -= CanLoadedBullets;
 	LoadedBullets += CanLoadedBullets;
+	ChangeBulletDelegate.Broadcast(LoadedBullets, RemainBullets);
 
-	UE_LOG(LogTemp, Log, TEXT("LoadedBullets : %d / RemainBullets %d"), LoadedBullets, RemainBullets);
 }
 
 bool AHKWeapon::CanReload()
@@ -66,6 +65,7 @@ bool AHKWeapon::CanReload()
 void AHKWeapon::AddAmmo()
 {
 	RemainBullets += MaximumLoadedBullets * 2;
-	UE_LOG(LogTemp, Log, TEXT("LoadedBullets : %d / RemainBullets : %d"), LoadedBullets, RemainBullets);
+	//UE_LOG(LogTemp, Log, TEXT("LoadedBullets : %d / RemainBullets : %d"), LoadedBullets, RemainBullets);
+	ChangeBulletDelegate.Broadcast(LoadedBullets, RemainBullets);
 }
 

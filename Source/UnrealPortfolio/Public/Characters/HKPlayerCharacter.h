@@ -14,6 +14,7 @@ class AHKWeapon;
 class UCameraComponent;
 class UAbilitySystemComponent;
 class USpringArmComponent;
+class UGameplayEffect;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGettingWeaponDelegate, AHKWeapon*, Weapon);
 
@@ -67,13 +68,17 @@ private:
 	UFUNCTION()
 	void OnRep_ChangeWeapon();
 
+	//클라이언트에서 ASC가 완료되면 보내는 함수
+	UFUNCTION(Server, Reliable)
+	void CompleteSettingASC_Server();
+
 	UFUNCTION(Server, Unreliable)
 	void UpdateInputMoveValue_Server(const FVector2D& OwnerInputMoveValue);
 	UFUNCTION(Server, Unreliable)
 	void UpdateInputLookValue_Server(const FRotator& OwnerInputLookValue);
 
 	UFUNCTION(Client, Reliable)
-	void AcquireWeapon(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
+	void AcquireTag(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AAWeapon Data")
@@ -138,6 +143,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TMap<int32, TSubclassOf<AHKWeapon>> SwapWeapons;
 
+	UPROPERTY(EditAnywhere, Category = "AAGAS")
+	TArray<TSubclassOf<UGameplayEffect>> StartEffects;
 
 //Behaviour Params
 private:

@@ -13,6 +13,8 @@
 class USkeletalMesh;
 class UTexture2D;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBulletChangeDelegate, int, NowBullet, int, MaxBullet);
+
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
@@ -71,6 +73,10 @@ public:
 	const FORCEINLINE float GetAfterZoomFieldOfView() const { return AfterZoomFieldOfView; }
 	const FORCEINLINE float GetBeforeZoomTargetArmLength() const { return BeforeZoomTargetArmLength; }
 	const FORCEINLINE float GetAfterZoomTargetArmLength() const { return AfterZoomTargetArmLength; }
+
+	FBulletChangeDelegate ChangeBulletDelegate;
+	UFUNCTION()
+	void BroadCastChangeBulletDelegate() { ChangeBulletDelegate.Broadcast(GetLoadedBullets(), GetRemainBullets()); }
 
 protected:
 

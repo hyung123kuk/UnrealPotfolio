@@ -26,6 +26,11 @@ bool UHKGameplayAbility_Attack::CanActivateAbility(const FGameplayAbilitySpecHan
 
 	AHKPlayerCharacter* Character = CastChecked<AHKPlayerCharacter>(ActorInfo->AvatarActor.Get());
 	AHKWeapon* Weapon = Character->GetWeapon();
+	if (Weapon == nullptr)
+	{
+		return false;
+	}
+
 	CanAbility = Weapon->LoadedBullet();
 	if (!CanAbility)
 	{

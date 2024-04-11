@@ -5,6 +5,7 @@
 #include "Characters/HKPlayerCharacter.h"
 #include "Item/HKWeapon.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
 
 
 void UHKInventoryWidget::SetAbilitySystemComponent(AActor* InOwner)
@@ -33,6 +34,13 @@ void UHKInventoryWidget::PutItemInInventory(AHKWeapon* NewWeapon)
 	ItemImages[InventorySlotCount]->SetColorAndOpacity(EquipColor);
 
 	InventorySlotCount++;
+
+	NewWeapon->ChangeBulletDelegate.AddDynamic(this, &UHKInventoryWidget::SetBullet);
+}
+
+void UHKInventoryWidget::SetBullet(int NowBullet, int MaxBullet)
+{
+	BulletText->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), NowBullet, MaxBullet)));
 }
 
 

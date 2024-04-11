@@ -9,6 +9,7 @@
 class UImage;
 class AHKWeapon;
 struct FLinearColor;
+class UTextBlock;
 
 /**
  * 
@@ -24,6 +25,9 @@ public:
 	UFUNCTION()
 	void PutItemInInventory(AHKWeapon* NewWeapon);
 
+	UFUNCTION()
+	void SetBullet(int NowBullet, int MaxBullet);
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> ItemImage1;
@@ -34,9 +38,14 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> ItemImage3;
 	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> BulletText;
+
 	UPROPERTY()
 	TArray<TObjectPtr<UImage>> ItemImages;
 
-	int InventorySlotCount = 1;
+	int InventorySlotCount;
 	FLinearColor EquipColor;
+
+
 };

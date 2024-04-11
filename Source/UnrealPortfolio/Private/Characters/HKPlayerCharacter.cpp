@@ -108,6 +108,8 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 		GetMesh()->SetAnimInstanceClass(AnimInstanceRef.Class);
 	}
 
+	//첫번째 무기 피스톨 기본
+	HaveWeapons.Init(-1, SlotMaxCount);
 }
 
 void AHKPlayerCharacter::BeginPlay()
@@ -124,10 +126,6 @@ void AHKPlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-
-	//첫번째 무기 피스톨 기본
-	HaveWeapons.Init(-1, SlotMaxCount);
-	HaveWeapons[0] = GetWeaponNumber(FGameplayTag::RequestGameplayTag(FName("Character.Event.GetPistol")));
 }
 
 void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -186,7 +184,7 @@ void AHKPlayerCharacter::PossessedBy(AController* NewController)
 		ASC->GiveAbility(StartSpec);
 	}
 
-	ASC->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &AHKPlayerCharacter::AcquireWeapon);
+	ASC->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &AHKPlayerCharacter::AcquireTag);
 }
 
 void AHKPlayerCharacter::OnRep_PlayerState()
@@ -195,12 +193,31 @@ void AHKPlayerCharacter::OnRep_PlayerState()
 
 	InitAbilityActorInfo();
 
+	if (GetOwner() == UGameplayStatics::GetPlayerController(this, 0))
+	{
+		//ASC 초기화가 된 후에 HUD 사용 가능
+		AHKPlayerControllerBase* HKControllerBase = Cast<AHKPlayerControllerBase>(GetController());
+		HKControllerBase->ShowHUD();
+	}
+
+	CompleteSettingASC_Server();
+
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (PlayerController)
 	{
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
+}
 
+void AHKPlayerCharacter::CompleteSettingASC_Server_Implementation()
+{
+	for (TSubclassOf<UGameplayEffect> StartEffect : StartEffects)
+	{
+		FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
+		EffectContextHandle.AddSourceObject(this);
+		const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(StartEffect, 1, EffectContextHandle);
+		const FActiveGameplayEffectHandle ActiveEffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+	}
 }
 
 void AHKPlayerCharacter::InitAbilityActorInfo()
@@ -210,14 +227,6 @@ void AHKPlayerCharacter::InitAbilityActorInfo()
 	ASC = GASPS->GetAbilitySystemComponent();
 	ASC->InitAbilityActorInfo(GASPS, this);
 	CharacterAttributeSet = GASPS->GetAttributeSet();
-
-
-	if (!HasAuthority() && GetOwner() == UGameplayStatics::GetPlayerController(this, 0))
-	{
-		//ASC 초기화가 된 후에 HUD 사용 가능
-		AHKPlayerControllerBase* HKControllerBase = Cast<AHKPlayerControllerBase>(GetController());
-		HKControllerBase->ShowHUD();
-	}
 }
 
 UAbilitySystemComponent* AHKPlayerCharacter::GetAbilitySystemComponent() const
@@ -282,6 +291,9 @@ void AHKPlayerCharacter::ChangeWeapon(const FInputActionValue& Value)
 		return;
 
 	AHKWeapon* NewWeapon = Cast<AHKWeapon>(SwapWeapons.Find(ChangeWeaponKey)->GetDefaultObject());
+	if (NewWeapon == nullptr)
+		return;
+
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(NewWeapon->GetSwapAbility());
 
 	if (Spec)
@@ -295,12 +307,10 @@ void AHKPlayerCharacter::OnRep_ChangeWeapon()
 	SetWeapon(EquipWeapon);
 }
 
-void AHKPlayerCharacter::AcquireWeapon_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
+void AHKPlayerCharacter::AcquireTag_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
 {
-
 	FGameplayTagContainer TagContainer;
 	EffectSpec.GetAllAssetTags(TagContainer);
-
 	for (const FGameplayTag& Tag : TagContainer)
 	{
 		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Character.Event"))))
@@ -313,6 +323,10 @@ void AHKPlayerCharacter::AcquireWeapon_Implementation(UAbilitySystemComponent* A
 			int32 WeaponNumber = GetWeaponNumber(Tag);
 			HaveWeapons[EmptySocketNum] = WeaponNumber;
 			GetWeaponDelegate.Broadcast(SwapWeapons[WeaponNumber].GetDefaultObject());
+		}
+		else if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Weapon.AddAmmo"))))
+		{
+			GetWeapon()->AddAmmo();
 		}
 	}
 }

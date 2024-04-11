@@ -43,7 +43,7 @@ void UHKGameplayAbility_WeaponSwap::ActivateAbility(const FGameplayAbilitySpecHa
 	SwapMontageTask->ReadyForActivation();
 
 	PlayerCharacter->SetWeapon(SwapWeapon.GetDefaultObject());
-
+	SwapWeapon.GetDefaultObject()->BroadCastChangeBulletDelegate();
 }
 
 void UHKGameplayAbility_WeaponSwap::OnCompleteCallback()
