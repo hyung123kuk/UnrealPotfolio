@@ -108,8 +108,20 @@ AHKPlayerCharacter::AHKPlayerCharacter()
 		GetMesh()->SetAnimInstanceClass(AnimInstanceRef.Class);
 	}
 
-	//첫번째 무기 피스톨 기본
 	HaveWeapons.Init(-1, SlotMaxCount);
+
+	DamageUpWidget = CreateDefaultSubobject<UHKWidgetComponent>(TEXT("DamageUpWidget"));
+	DamageUpWidget->SetupAttachment(GetMesh());
+	DamageUpWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 220.f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> DamageUpWidgetRef(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Main/UI/WBP_DamageUp.WBP_DamageUp_C'"));
+	if (DamageUpWidgetRef.Class)
+	{
+		DamageUpWidget->SetWidgetClass(DamageUpWidgetRef.Class);
+		DamageUpWidget->SetWidgetSpace(EWidgetSpace::Screen);
+		DamageUpWidget->SetDrawSize(FVector2D(30.f, 30.f));
+		DamageUpWidget->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		DamageUpWidget->SetHiddenInGame(true);
+	}
 }
 
 void AHKPlayerCharacter::BeginPlay()
@@ -145,7 +157,6 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::ChangeWeapon);
 	}
 
-	ChangeWeapon(1);
 }
 
 void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -185,6 +196,11 @@ void AHKPlayerCharacter::PossessedBy(AController* NewController)
 	}
 
 	ASC->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &AHKPlayerCharacter::AcquireTag);
+	ASC->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag(FName("Character.Buff.DamageUp")),
+		EGameplayTagEventType::NewOrRemoved).AddUObject(
+		this,
+		&AHKPlayerCharacter::DamageUpTagChanged
+	);
 }
 
 void AHKPlayerCharacter::OnRep_PlayerState()
@@ -329,6 +345,12 @@ void AHKPlayerCharacter::AcquireTag_Implementation(UAbilitySystemComponent* Abil
 			GetWeapon()->AddAmmo();
 		}
 	}
+}
+
+void AHKPlayerCharacter::DamageUpTagChanged_Implementation(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bool DamageUp = NewCount > 0;
+	DamageUpWidget->SetHiddenInGame(!DamageUp);
 }
 
 int32 AHKPlayerCharacter::GetWeaponNumber(const FGameplayTag& Tag)

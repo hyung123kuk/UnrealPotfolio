@@ -55,7 +55,6 @@ protected:
 //Ability Func
 protected:	
 	void InitAbilityActorInfo();
-
 	void GASInputPressed(int32 InputId);
 
 //Behaviour Func
@@ -79,6 +78,9 @@ private:
 
 	UFUNCTION(Client, Reliable)
 	void AcquireTag(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void DamageUpTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AAWeapon Data")
@@ -158,4 +160,10 @@ private:
 	int32 SlotMaxCount = 3;
 
 	friend class AHKTargetActor_Shot;
+
+//UI
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UHKWidgetComponent> DamageUpWidget;
+
 };

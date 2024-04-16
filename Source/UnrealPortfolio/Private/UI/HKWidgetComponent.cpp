@@ -11,6 +11,6 @@ void UHKWidgetComponent::InitWidget()
 	UHKUserWidget* UserWidget = Cast<UHKUserWidget>(GetWidget());
 	if (UserWidget)
 	{
-		
+		UserWidget->SetAbilitySystemComponent(GetOwner());
 	}
 }
