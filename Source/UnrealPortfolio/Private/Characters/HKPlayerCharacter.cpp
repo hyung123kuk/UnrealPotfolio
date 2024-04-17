@@ -148,15 +148,20 @@ void AHKPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
-	if (IsValid(ASC))
+	SetupGASInputComponent();
+}
+
+void AHKPlayerCharacter::SetupGASInputComponent()
+{
+	if (IsValid(ASC) && IsValid(InputComponent))
 	{
+		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 1);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 2);		
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 2);
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::GASInputPressed, 3);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Started, this, &AHKPlayerCharacter::GASInputPressed, 4);
 		EnhancedInputComponent->BindAction(ChangeWeaponAction, ETriggerEvent::Triggered, this, &AHKPlayerCharacter::ChangeWeapon);
 	}
-
 }
 
 void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -171,7 +176,6 @@ void AHKPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 void AHKPlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
 	InitAbilityActorInfo();
 
 	for (const auto& StartAbility : StartAbilities)
@@ -208,7 +212,7 @@ void AHKPlayerCharacter::OnRep_PlayerState()
 	Super::OnRep_PlayerState(); 
 
 	InitAbilityActorInfo();
-
+	SetupGASInputComponent();
 	if (GetOwner() == UGameplayStatics::GetPlayerController(this, 0))
 	{
 		//ASC 초기화가 된 후에 HUD 사용 가능
@@ -221,7 +225,7 @@ void AHKPlayerCharacter::OnRep_PlayerState()
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (PlayerController)
 	{
-		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
+		//PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
 }
 
@@ -235,6 +239,7 @@ void AHKPlayerCharacter::CompleteSettingASC_Server_Implementation()
 		const FActiveGameplayEffectHandle ActiveEffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 	}
 }
+
 
 void AHKPlayerCharacter::InitAbilityActorInfo()
 {

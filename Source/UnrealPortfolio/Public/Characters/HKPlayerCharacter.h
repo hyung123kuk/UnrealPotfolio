@@ -53,7 +53,8 @@ protected:
 	virtual void OnRep_PlayerState() override;
 
 //Ability Func
-protected:	
+protected:
+	void SetupGASInputComponent();
 	void InitAbilityActorInfo();
 	void GASInputPressed(int32 InputId);
 
