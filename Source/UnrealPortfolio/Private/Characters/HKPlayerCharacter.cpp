@@ -349,6 +349,15 @@ void AHKPlayerCharacter::AcquireTag_Implementation(UAbilitySystemComponent* Abil
 				return;
 
 			int32 WeaponNumber = GetWeaponNumber(Tag);
+			
+			// 이미 있는 경우 총알 충전
+			int32 AlreadyWeapon;
+			if (HaveWeapons.Find(WeaponNumber, AlreadyWeapon))
+			{
+				SwapWeapons[WeaponNumber].GetDefaultObject()->AddAmmo();
+				return;
+			}
+
 			HaveWeapons[EmptySocketNum] = WeaponNumber;
 			GetWeaponDelegate.Broadcast(SwapWeapons[WeaponNumber].GetDefaultObject());
 		}

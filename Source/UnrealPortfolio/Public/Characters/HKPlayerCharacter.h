@@ -87,6 +87,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AAWeapon Data")
 	TObjectPtr<UDataTable> WeaponsDataTable;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWeapon")
+	TMap<int32, TSubclassOf<AHKWeapon>> SwapWeapons;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWeapon")
+	TArray<int32> HaveWeapons;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWeapon")
+	int32 SlotMaxCount = 3;
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AACamera", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
@@ -102,9 +111,6 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_ChangeWeapon, EditAnywhere, Category = "AAWeapon")
 	TObjectPtr<AHKWeapon> EquipWeapon;
-
-	UPROPERTY(EditAnywhere, Category = "AAWeapon")
-	TArray<int32> HaveWeapons;
 
 //Input Action
 protected:
@@ -144,9 +150,6 @@ protected:
 	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
 
 	UPROPERTY(EditAnywhere, Category = "AAGAS")
-	TMap<int32, TSubclassOf<AHKWeapon>> SwapWeapons;
-
-	UPROPERTY(EditAnywhere, Category = "AAGAS")
 	TArray<TSubclassOf<UGameplayEffect>> StartEffects;
 
 //Behaviour Params
@@ -158,7 +161,6 @@ private:
 	FRotator InputLookValue;
 
 	bool IsZoom;
-	int32 SlotMaxCount = 3;
 
 	friend class AHKTargetActor_Shot;
 
