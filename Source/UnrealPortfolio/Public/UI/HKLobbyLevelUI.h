@@ -21,24 +21,13 @@ protected:
 	
 private:
     UFUNCTION()
-    void OnRedTeamButtonClicked();
-
-    UFUNCTION()
-    void OnBlueTeamButtonClicked();
-
-    UFUNCTION()
     void OnSubmitButtonClicked();
 	
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AALobbyUI", Meta = (AllowPrivateAccess, BindWidget))
-    TObjectPtr<class UButton> RedTeamButton;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AALobbyUI", Meta = (AllowPrivateAccess, BindWidget))
-    TObjectPtr<class UButton> BlueTeamButton;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AALobbyUI", Meta = (AllowPrivateAccess, BindWidget))
     TObjectPtr<class UButton> SubmitButton;
 
-    int IsTeam;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = USLobbyLevelUI, Meta = (AllowPrivateAccess, BindWidget))
+    TObjectPtr<class UEditableText> EditServerIP;
 
 };

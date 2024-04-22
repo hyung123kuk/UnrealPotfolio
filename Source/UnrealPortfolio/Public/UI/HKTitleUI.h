@@ -27,11 +27,17 @@ private:
 	UFUNCTION()
 	void OnExitGameButtonClicked();
 
+	UFUNCTION()
+	void OnSingleGameButtonClicked();
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AATitleUI", Meta = (AllowPrivateAccess, BindWidget))
 	TObjectPtr<class UButton> NewGameButton;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AATitleUI", Meta = (AllowPrivateAccess, BindWidget))
 	TObjectPtr<class UButton> ExitGameButton;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AATitleUI", Meta = (AllowPrivateAccess, BindWidget))
+	TObjectPtr<class UButton> SingleGameButton;
 
 };

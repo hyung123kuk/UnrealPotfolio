@@ -12,20 +12,7 @@
 void UHKLobbyLevelUI::NativeConstruct()
 {
     Super::NativeConstruct();
-
-    RedTeamButton.Get()->OnClicked.AddDynamic(this, &ThisClass::OnRedTeamButtonClicked);
-    BlueTeamButton.Get()->OnClicked.AddDynamic(this, &ThisClass::OnBlueTeamButtonClicked);
     SubmitButton.Get()->OnClicked.AddDynamic(this, &ThisClass::OnSubmitButtonClicked);
-}
-
-void UHKLobbyLevelUI::OnRedTeamButtonClicked()
-{
-    IsTeam = 0;
-}
-
-void UHKLobbyLevelUI::OnBlueTeamButtonClicked()
-{
-    IsTeam = 1;
 }
 
 void UHKLobbyLevelUI::OnSubmitButtonClicked()
@@ -34,6 +21,7 @@ void UHKLobbyLevelUI::OnSubmitButtonClicked()
     AHKUIPlayerController* PlayerController = GetOwningPlayer<AHKUIPlayerController>();
     if (IsValid(PlayerController) == true)
     {
-        PlayerController->JoinServer(ServerIP);
+        FText ServerIP = EditServerIP->GetText();
+        PlayerController->JoinServer(ServerIP.ToString());
     }
 }

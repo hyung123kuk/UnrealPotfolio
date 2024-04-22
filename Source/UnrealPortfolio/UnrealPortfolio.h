@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 
-// ServerIP
-#define ServerIP FString(TEXT("127.0.0.1:17777"))
 
 // Collision
 #define CHANNEL_HKCHARACTER ECC_GameTraceChannel1

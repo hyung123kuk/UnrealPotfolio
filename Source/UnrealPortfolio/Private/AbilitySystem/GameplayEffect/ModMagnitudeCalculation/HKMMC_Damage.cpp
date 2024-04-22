@@ -5,6 +5,8 @@
 #include "Characters/HKPlayerCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "Item/HKWeapon.h"
+#include "Kismet/GameplayStatics.h"
+#include "Game/HKGameState.h"
 
 UHKMMC_Damage::UHKMMC_Damage()
 {
@@ -12,6 +14,7 @@ UHKMMC_Damage::UHKMMC_Damage()
 
 float UHKMMC_Damage::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
+
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
 

@@ -8,6 +8,8 @@
 
 class UHKHUD;
 class UCameraShakeBase;
+class UHKGameResultWidget;
+
 /**
  * 
  */
@@ -24,6 +26,21 @@ public:
 	void ShowHUD();
 	UHKHUD* GetHUDWidget() const { return HUDWidget; }
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(Client, Reliable)
+	void ShowWinnerUI();
+
+	UFUNCTION(Client, Reliable)
+	void ShowLooserUI(int32 InRanking);
+
+	UFUNCTION(Client, Reliable)
+	void ReturnToLobby();
+
+public:
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "AAWidget", Meta = (AllowPrivateAccess))
+	FText NotificationText;
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AACamera", Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UCameraShakeBase> FireShake;
@@ -31,6 +48,16 @@ private:
 	UPROPERTY();
 	TObjectPtr<UHKHUD> HUDWidget;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ASPlayerController", Meta = (AllowPrivateAccess));
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AAWidget", Meta = (AllowPrivateAccess))
 	TSubclassOf<UHKHUD> HUDWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AAWidget", Meta = (AllowPrivateAccess))
+	TSubclassOf<UUserWidget> NotificationTextUIClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWidget", Meta = (AllowPrivateAccess))
+	TSubclassOf<UHKGameResultWidget> WinnerUIClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AAWidget", Meta = (AllowPrivateAccess))
+	TSubclassOf<UHKGameResultWidget> LooserUIClass;
+
 };

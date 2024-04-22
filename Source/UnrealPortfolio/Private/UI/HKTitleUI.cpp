@@ -16,6 +16,7 @@ void UHKTitleUI::NativeConstruct()
 {
 	NewGameButton.Get()->OnClicked.AddDynamic(this, &ThisClass::OnNewGameButtonClicked);
 	ExitGameButton.Get()->OnClicked.AddDynamic(this, &ThisClass::OnExitGameButtonClicked);
+	SingleGameButton.Get()->OnClicked.AddDynamic(this, &ThisClass::OnSingleGameButtonClicked);
 }
 
 void UHKTitleUI::OnNewGameButtonClicked()
@@ -26,4 +27,9 @@ void UHKTitleUI::OnNewGameButtonClicked()
 void UHKTitleUI::OnExitGameButtonClicked()
 {
 	UKismetSystemLibrary::QuitGame(this, GetOwningPlayer(), EQuitPreference::Quit, false);
+}
+
+void UHKTitleUI::OnSingleGameButtonClicked()
+{
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Loading"), true, FString(TEXT("NextLevel=Main?Saved=false")));
 }

@@ -39,6 +39,8 @@ void UHKCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
 			isDead = true;
 			FGameplayEventData PayloadData;
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningActor(), FGameplayTag::RequestGameplayTag(FName("Character.State.IsDead")), PayloadData);
+			UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent();
+			DeadDelegate.Broadcast(ASC);
 		}
 	}
 

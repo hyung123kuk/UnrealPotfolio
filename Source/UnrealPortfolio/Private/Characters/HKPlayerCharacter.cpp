@@ -21,6 +21,7 @@
 #include "UI/HKUserWidget.h"
 #include "Controllers/HKPlayerControllerBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Game/HKGameState.h"
 
 
 AHKPlayerCharacter::AHKPlayerCharacter()
@@ -257,6 +258,12 @@ UAbilitySystemComponent* AHKPlayerCharacter::GetAbilitySystemComponent() const
 
 void AHKPlayerCharacter::GASInputPressed(int32 InputId)
 {
+	AHKGameState* HKGameState = Cast<AHKGameState>(UGameplayStatics::GetGameState(this));
+	if (IsValid(HKGameState) && HKGameState->MatchState != EMatchState::Playing)
+	{
+		return;
+	}
+
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
